@@ -5,11 +5,12 @@ export default function Course_Form({ onClose,onCourseAdded }) {
   const [credits, setCredits] = useState("");
   const [semester, setSemester] = useState("");
   const [department, setDepartment] = useState("");
+  const [course_id, setCourseId] = useState("");
 
   const handleSubmit = async () => {
   const instructorId = localStorage.getItem("userId");
 
-  if (!courseTitle || !credits || !semester || !department) {
+  if (!courseTitle || !course_id||!credits || !semester || !department) {
     alert("Please fill all fields");
     return;
   }
@@ -22,6 +23,7 @@ export default function Course_Form({ onClose,onCourseAdded }) {
       },
       body: JSON.stringify({
         title: courseTitle,
+        course_id,
         credits,
         semester,
         department,
@@ -42,6 +44,7 @@ export default function Course_Form({ onClose,onCourseAdded }) {
 
     // Clear form
     setCourseTitle("");
+    setCourseId("");
     setCredits("");
     setSemester("");
     setDepartment("");
@@ -71,6 +74,13 @@ export default function Course_Form({ onClose,onCourseAdded }) {
         placeholder="Course Title"
         value={courseTitle}
         onChange={(e) => setCourseTitle(e.target.value)}
+        style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+      />
+      <input
+        type="text"
+        placeholder="Course Code"
+        value={course_id}
+        onChange={(e) => setCourseId(e.target.value)}
         style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
       />
 

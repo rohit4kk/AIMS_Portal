@@ -132,25 +132,21 @@ app.get("/instructor/:id", async (req, res) => {
 });
 
 app.post("/instructor/add-course", async (req, res) => {
-  const { title, credits, semester, department, instructorId } = req.body;
+  const { title, course_id,credits, semester, department, instructorId } = req.body;
 
   // Basic validation
-  if (!title || !credits || !semester || !department || !instructorId) {
+  if (!title || !course_id || !credits || !semester || !department || !instructorId) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
-    // 1️⃣ Generate a course_id (simple version)
-    const courseId = title
-      .toUpperCase()
-      .replace(/\s+/g, "_")
-      .slice(0, 10) + "_" + Math.floor(Math.random() * 1000);
+   
 
-    // 2️⃣ Insert into COURSES table
+    // 2️ Insert into COURSES table
     const { error: courseError } = await supabase
       .from("courses")
       .insert({
-        course_id: courseId,
+        course_id,
         title,
         department,
         credits
@@ -166,7 +162,7 @@ app.post("/instructor/add-course", async (req, res) => {
       .from("teaches")
       .insert({
         instructor_id: instructorId,
-        course_id: courseId,
+        course_id,
         semester
       });
 
@@ -177,7 +173,7 @@ app.post("/instructor/add-course", async (req, res) => {
 
     res.json({
       message: "Course added successfully",
-      course_id: courseId
+      course_id
     });
 
   } catch (err) {
