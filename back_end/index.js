@@ -51,7 +51,7 @@ if (!users || users.length === 0) {
 
   // 2. Generate OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
   // 3. Store OTP in users table
   await supabase
@@ -86,7 +86,7 @@ app.post("/verify-otp", async (req, res) => {
 
   if (
     !user ||
-    user.otp !== otp ||
+    string(user.otp) !== string(otp) ||
     !user.otp_expires_at ||
     new Date(user.otp_expires_at) < new Date()
   ) {
@@ -130,6 +130,83 @@ app.get("/instructor/:id", async (req, res) => {
 
   res.json(data[0]);
 });
+
+//FOR FACULTY ADVISOR 
+
+// ================= FACULTY ADVISOR DETAILS =================
+app.get("/fa/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("faculty_advisors")
+    .select("name, email, department")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) {
+    return res.status(404).json({ error: "Faculty Advisor not found" });
+  }
+
+  res.json(data);
+});
+
+
+// ================= FA PENDING APPROVAL REQUESTS =================
+app.get("/fa/:faId/requests", async (req, res) => {
+  const { faId } = req.params;
+
+  const { data, error } = await supabase
+    .from("takes")
+    .select(`
+      student_id,
+      course_id,
+      semester,
+      students (
+        name,
+        email,
+        fa_id
+      ),
+      courses (
+        title,
+        credits
+      )
+    `)
+    .eq("status", "PENDING_ADVISOR_APPROVAL")
+    .eq("students.fa_id", faId);
+
+  if (error) {
+    return res.status(500).json({ error: "Failed to fetch requests" });
+  }
+
+  res.json(data);
+});
+
+
+// ================= FA APPROVE / REJECT =================
+app.post("/fa/decision", async (req, res) => {
+  const { student_id, course_id, semester, decision } = req.body;
+
+  const newStatus =
+    decision === "APPROVE"
+      ? "ENROLLED"
+      : "REJECTED_BY_ADVISOR";
+
+  const { error } = await supabase
+    .from("takes")
+    .update({ status: newStatus })
+    .match({ student_id, course_id, semester });
+
+  if (error) {
+    return res.status(500).json({ error: "Failed to update status" });
+  }
+
+  res.json({ message: "Decision recorded" });
+});
+
+
+
+
+
 
 app.post("/instructor/add-course", async (req, res) => {
   const { title, course_id,credits, semester, department, instructorId } = req.body;
