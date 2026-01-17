@@ -109,6 +109,117 @@ app.post("/verify-otp", async (req, res) => {
   });
 });
 
+//for instructor details
+app.get("/instructor/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("instructors")
+    .select("name, email, department")
+    .eq("id", id)
+    .limit(1);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Database error" });
+  }
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: "Instructor not found" });
+  }
+
+  res.json(data[0]);
+});
+
+app.post("/instructor/add-course", async (req, res) => {
+  const { title, credits, semester, department, instructorId } = req.body;
+
+  // Basic validation
+  if (!title || !credits || !semester || !department || !instructorId) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // 1️⃣ Generate a course_id (simple version)
+    const courseId = title
+      .toUpperCase()
+      .replace(/\s+/g, "_")
+      .slice(0, 10) + "_" + Math.floor(Math.random() * 1000);
+
+    // 2️⃣ Insert into COURSES table
+    const { error: courseError } = await supabase
+      .from("courses")
+      .insert({
+        course_id: courseId,
+        title,
+        department,
+        credits
+      });
+
+    if (courseError) {
+      console.error(courseError);
+      return res.status(500).json({ error: "Failed to create course" });
+    }
+
+    // 3️⃣ Insert into TEACHES table
+    const { error: teachesError } = await supabase
+      .from("teaches")
+      .insert({
+        instructor_id: instructorId,
+        course_id: courseId,
+        semester
+      });
+
+    if (teachesError) {
+      console.error(teachesError);
+      return res.status(500).json({ error: "Failed to assign course" });
+    }
+
+    res.json({
+      message: "Course added successfully",
+      course_id: courseId
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/instructor/:id/courses", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("teaches")
+    .select(`
+      semester,
+      courses (
+        course_id,
+        title,
+        credits,
+        department
+      )
+    `)
+    .eq("instructor_id", id);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch courses" });
+  }
+
+  // Format response for frontend
+  const formatted = data.map((row) => ({
+    course_id: row.courses.course_id,
+    title: row.courses.title,
+    credits: row.courses.credits,
+    department: row.courses.department,
+    semester: row.semester
+  }));
+
+  res.json(formatted);
+});
+
+
 app.listen(5000, () => {
   console.log("AIMS backend running on port 5000");
 });

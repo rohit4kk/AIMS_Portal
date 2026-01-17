@@ -29,28 +29,32 @@ export default function Login() {
   };
 
   const verifyOtp = async () => {
-    setMessage("");
+  setMessage("");
 
-    const res = await fetch("http://localhost:5000/verify-otp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, otp })
-    });
+  const res = await fetch("http://localhost:5000/verify-otp", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, otp })
+  });
 
-    const data = await res.json();
+  const data = await res.json();
 
-    if (!res.ok) {
-      setMessage(data.error || "Invalid OTP");
-      return;
-    }
+  if (!res.ok) {
+    setMessage(data.error || "Invalid OTP");
+    return;
+  }
 
-    // Redirect based on role
-    if (data.role === "STUDENT") window.location.href = "/student";
-    if (data.role === "INSTRUCTOR") window.location.href = "/instructor";
-    if (data.role === "FACULTY_ADVISOR") window.location.href = "/fa";
-  };
+  // ✅ STORE USER ID AFTER SUCCESSFUL LOGIN
+  localStorage.setItem("userId", data.userId);
+  localStorage.setItem("role", data.role);
+
+  // Redirect based on role
+  if (data.role === "STUDENT") window.location.href = "/student";
+  if (data.role === "INSTRUCTOR") window.location.href = "/instructor";
+  if (data.role === "FACULTY_ADVISOR") window.location.href = "/fa";
+};
 
   return (
     <div style={{ padding: "40px", maxWidth: "400px", margin: "auto" }}>
