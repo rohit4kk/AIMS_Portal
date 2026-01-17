@@ -92,13 +92,16 @@ export default function Course_Form({ onClose,onCourseAdded }) {
         style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
       />
 
-      <input
-        type="text"
-        placeholder="Semester (e.g. Sem 5)"
-        value={semester}
-        onChange={(e) => setSemester(e.target.value)}
-        style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-      />
+      <select
+    value={semester}
+    onChange={(e) => setSemester(e.target.value)}
+    style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+  >
+    <option value="" disabled>Select Semester</option>
+    <option value="2025-I">2025-I</option>
+    <option value="2025-II">2025-II</option>
+    <option value="2025-S">2025-S</option>
+  </select>
 
       <input
         type="text"

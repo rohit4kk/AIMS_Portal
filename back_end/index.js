@@ -215,6 +215,287 @@ app.get("/instructor/:id/courses", async (req, res) => {
   res.json(formatted);
 });
 
+// Student information
+app.get("/student/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("students")
+    .select("name, email, department, year")
+    .eq("id", id)
+    .limit(1);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Database error" });
+  }
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: "Student not found" });
+  }
+
+  res.json(data[0]);
+});
+
+
+//Courses info
+app.get("/courses", async (req, res) => {
+  const { data, error } = await supabase
+    .from("teaches")
+    .select(`
+      semester,
+      courses (
+        course_id,
+        title,
+        department,
+        credits
+      )
+    `);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch courses" });
+  }
+
+  // flatten response
+  const formatted = data.map(row => ({
+    course_id: row.courses.course_id,
+    title: row.courses.title,
+    department: row.courses.department,
+    credits: row.courses.credits,
+    semester: row.semester
+  }));
+
+  res.json(formatted);
+});
+
+
+// Enrollment requests for a course
+app.get("/courses/:courseId/requests", async (req, res) => {
+  const { courseId } = req.params;
+
+  const { data, error } = await supabase
+    .from("takes")
+    .select(`
+      status,
+      students (
+        name,
+        email
+      )
+    `)
+    .eq("course_id", courseId);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch requests" });
+  }
+
+  // Format response
+  const formatted = data.map(row => ({
+    name: row.students.name,
+    email: row.students.email,
+    status: row.status
+  }));
+
+  res.json(formatted);
+});
+
+// Enroll in a course
+app.post("/courses/:courseId/enroll", async (req, res) => {
+  const { courseId } = req.params;
+  const { studentId, semester } = req.body;
+
+  if (!studentId || !semester) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  // Check if already enrolled/requested
+  const { data: existing } = await supabase
+    .from("takes")
+    .select("student_id")
+    .eq("student_id", studentId)
+    .eq("course_id", courseId)
+    .eq("semester", semester)
+    .limit(1);
+
+  if (existing && existing.length > 0) {
+    return res
+      .status(400)
+      .json({ error: "Already enrolled or request exists" });
+  }
+
+  // Insert enrollment request
+  const { error } = await supabase.from("takes").insert({
+    student_id: studentId,
+    course_id: courseId,
+    semester,
+    status: "PENDING_INSTRUCTOR_APPROVAL"
+  });
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to enroll" });
+  }
+
+  res.json({ message: "Enrollment request submitted" });
+});
+
+// fetch course enrollment requests for instructor approval
+app.get("/instructor/course/:courseId/requests", async (req, res) => {
+  const { courseId } = req.params;
+
+  const { data, error } = await supabase
+    .from("takes")
+    .select(`
+      student_id,
+      status,
+      students (
+        name,
+        email,
+        department
+      )
+    `)
+    .eq("course_id", courseId)
+    .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch requests" });
+  }
+
+  const formatted = data.map(row => ({
+    student_id: row.student_id,
+    name: row.students.name,
+    email: row.students.email,
+    department: row.students.department,
+    status: row.status
+  }));
+
+  res.json(formatted);
+});
+
+
+// approve enrollment request
+app.post("/instructor/course/:courseId/approve", async (req, res) => {
+  const { courseId } = req.params;
+  const { studentId } = req.body;
+
+  if (!studentId) {
+    return res.status(400).json({ error: "Student ID required" });
+  }
+
+  const { error } = await supabase
+    .from("takes")
+    .update({ status: "PENDING_ADVISOR_APPROVAL" })
+    .eq("course_id", courseId)
+    .eq("student_id", studentId)
+    .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to approve request" });
+  }
+
+  res.json({ message: "Request approved" });
+});
+
+// reject enrollment request
+app.post("/instructor/course/:courseId/reject", async (req, res) => {
+  const { courseId } = req.params;
+  const { studentId } = req.body;
+
+  if (!studentId) {
+    return res.status(400).json({ error: "Student ID required" });
+  }
+
+  const { error } = await supabase
+    .from("takes")
+    .update({ status: "REJECTED_BY_INSTRUCTOR" })
+    .eq("course_id", courseId)
+    .eq("student_id", studentId)
+    .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to reject request" });
+  }
+
+  res.json({ message: "Request rejected" });
+});
+
+
+//FOR FACULTY ADVISOR 
+
+// ================= FACULTY ADVISOR DETAILS =================
+app.get("/fa/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("faculty_advisors")
+    .select("name, email, department")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) {
+    return res.status(404).json({ error: "Faculty Advisor not found" });
+  }
+
+  res.json(data);
+});
+
+
+// ================= FA PENDING APPROVAL REQUESTS =================
+app.get("/fa/:faId/requests", async (req, res) => {
+  const { faId } = req.params;
+
+  const { data, error } = await supabase
+    .from("takes")
+    .select(`
+      student_id,
+      course_id,
+      semester,
+      students (
+        name,
+        email,
+        fa_id
+      ),
+      courses (
+        title,
+        credits
+      )
+    `)
+    .eq("status", "PENDING_ADVISOR_APPROVAL")
+    .eq("students.fa_id", faId);
+
+  if (error) {
+    return res.status(500).json({ error: "Failed to fetch requests" });
+  }
+
+  res.json(data);
+});
+
+
+// ================= FA APPROVE / REJECT =================
+app.post("/fa/decision", async (req, res) => {
+  const { student_id, course_id, semester, decision } = req.body;
+
+  const newStatus =
+    decision === "APPROVE"
+      ? "ENROLLED"
+      : "REJECTED_BY_ADVISOR";
+
+  const { error } = await supabase
+    .from("takes")
+    .update({ status: newStatus })
+    .match({ student_id, course_id, semester });
+
+  if (error) {
+    return res.status(500).json({ error: "Failed to update status" });
+  }
+
+  res.json({ message: "Decision recorded" });
+});
+
 
 app.listen(5000, () => {
   console.log("AIMS backend running on port 5000");
