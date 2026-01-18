@@ -486,6 +486,53 @@ app.get("/fa/:faId/requests", async (req, res) => {
 
   res.json(data);
 });
+// ================= FA STUDENTS LIST =================
+app.get("/fa/:faId/students", async (req, res) => {
+  const { faId } = req.params;
+
+  const { data, error } = await supabase
+    .from("students")
+    .select("id, name, email, roll_no, department, year")
+    .eq("fa_id", faId);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch students" });
+  }
+
+  res.json(data);
+});
+
+// ================= FA DECISION HISTORY =================
+app.get("/fa/:faId/history", async (req, res) => {
+  const { faId } = req.params;
+
+  const { data, error } = await supabase
+    .from("takes")
+    .select(`
+      status,
+      semester,
+      students (
+        name,
+        roll_no,
+        email,
+        fa_id
+      ),
+      courses (
+        title
+      )
+    `)
+    .in("status", ["ENROLLED", "REJECTED_BY_ADVISOR"])
+    .eq("students.fa_id", faId)
+    .order("semester", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch history" });
+  }
+
+  res.json(data);
+});
 
 
 // ================= FA APPROVE / REJECT =================
