@@ -51,7 +51,7 @@ if (!users || users.length === 0) {
 
   // 2. Generate OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
   // 3. Store OTP in users table
   await supabase
@@ -83,15 +83,22 @@ app.post("/verify-otp", async (req, res) => {
     .select("id, role, otp, otp_expires_at")
     .eq("email", email)
     .single();
+    console.log("Stored OTP:", user.otp, typeof user.otp);
+    console.log("Received OTP:", otp, typeof otp);
+    console.log("Expires at:", user.otp_expires_at);
+    console.log("Now:", new Date().toISOString());
 
-  if (
-    !user ||
-    user.otp !== otp ||
-    !user.otp_expires_at ||
-    new Date(user.otp_expires_at) < new Date()
-  ) {
-    return res.status(400).json({ error: "Invalid or expired OTP" });
-  }
+    // 🔥 FIXED CHECKS
+    if (user.otp !== otp) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    if (
+      !user.otp_expires_at ||
+      user.otp_expires_at+"Z" <= new Date().toISOString()
+    ) {
+      return res.status(400).json({ error: "OTP expired" });
+    }
 
   // 2. Clear OTP after login
   await supabase
@@ -108,6 +115,7 @@ app.post("/verify-otp", async (req, res) => {
     role: user.role
   });
 });
+
 
 //for instructor details
 app.get("/instructor/:id", async (req, res) => {
@@ -280,7 +288,8 @@ app.get("/courses/:courseId/requests", async (req, res) => {
       status,
       students (
         name,
-        email
+        email,
+        roll_no
       )
     `)
     .eq("course_id", courseId);
@@ -294,6 +303,7 @@ app.get("/courses/:courseId/requests", async (req, res) => {
   const formatted = data.map(row => ({
     name: row.students.name,
     email: row.students.email,
+    roll_no: row.students.roll_no,
     status: row.status
   }));
 
@@ -352,7 +362,8 @@ app.get("/instructor/course/:courseId/requests", async (req, res) => {
       students (
         name,
         email,
-        department
+        department,
+        roll_no
       )
     `)
     .eq("course_id", courseId)
@@ -368,6 +379,7 @@ app.get("/instructor/course/:courseId/requests", async (req, res) => {
     name: row.students.name,
     email: row.students.email,
     department: row.students.department,
+    roll_no: row.students.roll_no,
     status: row.status
   }));
 
@@ -457,7 +469,8 @@ app.get("/fa/:faId/requests", async (req, res) => {
       students (
         name,
         email,
-        fa_id
+        fa_id,
+        roll_no
       ),
       courses (
         title,
@@ -495,6 +508,118 @@ app.post("/fa/decision", async (req, res) => {
 
   res.json({ message: "Decision recorded" });
 });
+
+// ================= FETCH ENROLLED STUDENTS =================
+app.get("/instructor/course/:courseId/enrolled", async (req, res) => {
+  const { courseId } = req.params;
+
+  const { data, error } = await supabase
+    .from("takes")
+    .select(`
+      student_id,
+      grade,
+      students (
+        name,
+        email,
+        roll_no
+      )
+    `)
+    .eq("course_id", courseId)
+    .eq("status", "ENROLLED");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch enrolled students" });
+  }
+
+  const formatted = data.map(row => ({
+    student_id: row.student_id,
+    name: row.students.name,
+    email: row.students.email,
+    roll_no: row.students.roll_no,
+    grade: row.grade
+  }));
+
+  res.json(formatted);
+});
+
+// ================= SUBMIT GRADE =================
+app.post("/instructor/course/:courseId/grade", async (req, res) => {
+  const { courseId } = req.params;
+  const { studentId, grade } = req.body;
+
+  if (!studentId || !grade) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
+
+  const { error } = await supabase
+    .from("takes")
+    .update({ grade })
+    .eq("course_id", courseId)
+    .eq("student_id", studentId)
+    .eq("status", "ENROLLED");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to submit grade" });
+  }
+
+  res.json({ message: "Grade updated" });
+});
+
+// ================= STUDENT ACADEMIC RECORD =================
+app.get("/student/:studentId/record", async (req, res) => {
+  const { studentId } = req.params;
+  console.log("Fetching record for student ID:", studentId);
+  const { data, error } = await supabase
+    .from("takes")
+    .select(`
+      semester,
+      status,
+      grade,
+      courses (
+        course_id,
+        title,
+        credits,
+        department
+      )
+    `)
+    .eq("student_id", studentId)
+    .order("semester", { ascending: false });
+
+  // 🔍 LOG RAW QUERY RESULT
+  console.log("Raw takes query result:", data);
+
+  if (error) {
+    console.error("Supabase error:", error);
+    return res.status(500).json({ error: "Failed to fetch student record" });
+  }
+
+  // Group by semester
+  const grouped = {};
+  data.forEach(row => {
+    if (!grouped[row.semester]) {
+      grouped[row.semester] = [];
+    }
+
+    console.log("Processing row:", row); // optional per-row debug
+
+    grouped[row.semester].push({
+      course_id: row.courses?.course_id,
+      title: row.courses?.title,
+      credits: row.courses?.credits,
+      department: row.courses?.department,
+      status: row.status,
+      grade: row.grade || "NA"
+    });
+  });
+
+  // 🔍 LOG FINAL GROUPED RESULT
+  console.log("Grouped student record:", grouped);
+
+  res.json(grouped);
+});
+
 
 
 app.listen(5000, () => {

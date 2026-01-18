@@ -72,6 +72,7 @@ export default function FacultyAdvisor() {
           }}
         >
           <p><b>Student:</b> {req.students.name}</p>
+          <p><b>Roll Number:</b> {req.students.roll_no}</p>
           <p><b>Course:</b> {req.courses.title}</p>
           <p><b>Semester:</b> {req.semester}</p>
 

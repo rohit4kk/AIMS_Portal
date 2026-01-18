@@ -65,6 +65,7 @@ export default function CourseModal({ course, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h2>{course.course_id} – {course.title}</h2>
           <button onClick={onClose}>X</button>
+          
         </div>
 
         {/* COURSE DETAILS */}
@@ -92,6 +93,7 @@ export default function CourseModal({ course, onClose }) {
             <thead>
               <tr>
                 <th style={th}>Student Name</th>
+                <th style={th}>Roll Number</th>
                 <th style={th}>Email</th>
                 <th style={th}>Status</th>
               </tr>
@@ -100,6 +102,7 @@ export default function CourseModal({ course, onClose }) {
               {requests.map((req, index) => (
                 <tr key={index}>
                   <td style={td}>{req.name}</td>
+                  <td style={td}>{req.roll_no}</td>
                   <td style={td}>{req.email}</td>
                   <td style={td}>{req.status}</td>
                 </tr>

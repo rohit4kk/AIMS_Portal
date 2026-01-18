@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import GiveGrade from "./GiveGrade";
+
 
 export default function InstructorCourseDetails() {
   const { courseId } = useParams();
@@ -7,6 +9,8 @@ export default function InstructorCourseDetails() {
   const course = location.state;
 
   const [requests, setRequests] = useState([]);
+  const [showGrade, setShowGrade] = useState(false);
+
 
   const fetchRequests = async () => {
     const res = await fetch(
@@ -74,12 +78,23 @@ export default function InstructorCourseDetails() {
 
   return (
     <div style={{ padding: "40px" }}>
+      <button onClick={() => setShowGrade(true)}>
+        Give Grade
+      </button>
       <h2>
         {course.course_id} – {course.title}
       </h2>
 
       <p><strong>Credits:</strong> {course.credits}</p>
       <p><strong>Semester:</strong> {course.semester}</p>
+
+      {showGrade && (
+        <GiveGrade
+          courseId={courseId}
+          onClose={() => setShowGrade(false)}
+        />
+      )}
+
 
       <hr />
 
@@ -92,9 +107,11 @@ export default function InstructorCourseDetails() {
           <thead>
             <tr>
               <th style={th}>Student Name</th>
+              <th style={th}>Roll Number</th>
               <th style={th}>Email</th>
               <th style={th}>Department</th>
               <th style={th}>Year</th>
+              
               <th style={th}>Action</th>
             </tr>
           </thead>
@@ -102,6 +119,7 @@ export default function InstructorCourseDetails() {
             {requests.map(req => (
               <tr key={req.student_id}>
                 <td style={td}>{req.name}</td>
+                <td style={td}>{req.roll_no}</td>
                 <td style={td}>{req.email}</td>
                 <td style={td}>{req.department}</td>
                 <td style={td}>{req.email.substring(0, 4)}</td>
