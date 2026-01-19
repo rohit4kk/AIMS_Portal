@@ -16,7 +16,7 @@ export default function Course_Form({ onClose,onCourseAdded }) {
   }
 
   try {
-    const res = await fetch("http://localhost:5000/instructor/add-course", {
+    const res = await fetch("http://localhost:5001/instructor/add-course", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

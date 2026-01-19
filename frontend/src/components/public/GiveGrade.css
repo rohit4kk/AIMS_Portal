@@ -1,0 +1,70 @@
+.give-grade-container {
+  padding: 20px;
+}
+
+/* Header */
+.give-grade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Buttons */
+.close-btn,
+.submit-btn,
+.update-btn {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.update-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+}
+
+/* Table */
+.grade-table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+.grade-table th,
+.grade-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.grade-table th {
+  background-color: grey;
+}
+
+/* Select */
+.grade-select {
+  padding: 6px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .give-grade-container {
+    padding: 15px;
+  }
+
+  .grade-table {
+    font-size: 14px;
+  }
+
+  .give-grade-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

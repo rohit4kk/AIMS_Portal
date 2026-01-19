@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./public/GiveGrade.css";
 
 const grades = ["A", "A-", "B", "B-", "C", "C-", "D", "E", "F"];
 
@@ -7,7 +8,7 @@ export default function GiveGrade({ courseId, onClose }) {
 
   const fetchEnrolled = async () => {
     const res = await fetch(
-      `http://localhost:5000/instructor/course/${courseId}/enrolled`
+      `http://localhost:5001/instructor/course/${courseId}/enrolled`
     );
     const data = await res.json();
 
@@ -21,7 +22,7 @@ export default function GiveGrade({ courseId, onClose }) {
 
   const submitGrade = async (studentId, grade) => {
     const res = await fetch(
-      `http://localhost:5000/instructor/course/${courseId}/grade`,
+      `http://localhost:5001/instructor/course/${courseId}/grade`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,11 +40,15 @@ export default function GiveGrade({ courseId, onClose }) {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h3>Grade Assignment</h3>
-      <button onClick={onClose}>Close</button>
+    <div className="give-grade-container">
+      <div className="give-grade-header">
+        <h3>Grade Assignment</h3>
+        <button className="close-btn" onClick={onClose}>
+          Close
+        </button>
+      </div>
 
-      <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
+      <table className="grade-table">
         <thead>
           <tr>
             <th>Name</th>
@@ -67,6 +72,7 @@ export default function GiveGrade({ courseId, onClose }) {
     </div>
   );
 }
+
 function GradeRow({ student, onSubmit }) {
   const [grade, setGrade] = useState(student.grade || "");
   const [isEditing, setIsEditing] = useState(!student.grade);
@@ -85,17 +91,17 @@ function GradeRow({ student, onSubmit }) {
     <tr>
       <td>{student.name}</td>
       <td>{student.email}</td>
-        <td>{student.roll_no}</td>
+      <td>{student.roll_no}</td>
 
-      {/* GRADE COLUMN */}
       <td>
         {isEditing ? (
           <select
+            className="grade-select"
             value={grade}
             onChange={(e) => setGrade(e.target.value)}
           >
             <option value="">Select</option>
-            {["A", "A-", "B", "B-", "C", "C-", "D", "E", "F"].map(g => (
+            {grades.map(g => (
               <option key={g} value={g}>{g}</option>
             ))}
           </select>
@@ -104,14 +110,16 @@ function GradeRow({ student, onSubmit }) {
         )}
       </td>
 
-      {/* ACTION COLUMN */}
       <td>
         {isEditing ? (
-          <button onClick={handleSubmit}>
+          <button className="submit-btn" onClick={handleSubmit}>
             Submit
           </button>
         ) : (
-          <button onClick={() => setIsEditing(true)}>
+          <button
+            className="update-btn"
+            onClick={() => setIsEditing(true)}
+          >
             Update
           </button>
         )}

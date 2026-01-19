@@ -1,0 +1,73 @@
+.course-details-container {
+  padding: 40px;
+}
+
+.give-grade-btn {
+  margin-bottom: 15px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.top-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+
+
+/* Table styles */
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.requests-table th,
+.requests-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.requests-table th {
+  background-color: grey;
+  color: white;
+}
+
+.action-cell {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-btn {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.reject-btn {
+  padding: 6px 12px;
+  cursor: pointer;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .course-details-container {
+    padding: 20px;
+  }
+
+  .requests-table {
+    font-size: 14px;
+  }
+
+  .action-cell {
+    flex-direction: column;
+  }
+  .top-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

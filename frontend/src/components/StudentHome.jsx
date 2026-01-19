@@ -7,7 +7,7 @@ export default function StudentHome() {
   useEffect(() => {
     async function fetchStudent() {
       const res = await fetch(
-        `http://localhost:5000/student/${studentId}`
+        `http://localhost:5001/student/${studentId}`
       );
       const data = await res.json();
 

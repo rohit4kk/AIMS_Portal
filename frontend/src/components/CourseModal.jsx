@@ -9,7 +9,7 @@ export default function CourseModal({ course, onClose }) {
             setLoading(true);
 
             const res = await fetch(
-            `http://localhost:5000/courses/${course.course_id}/requests`
+            `http://localhost:5001/courses/${course.course_id}/requests`
             );
             const data = await res.json();
 
@@ -25,7 +25,7 @@ export default function CourseModal({ course, onClose }) {
 
     const handleEnroll = async () => {
     const res = await fetch(
-        `http://localhost:5000/courses/${course.course_id}/enroll`,
+        `http://localhost:5001/courses/${course.course_id}/enroll`,
         {
         method: "POST",
         headers: {

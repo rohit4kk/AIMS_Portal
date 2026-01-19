@@ -12,25 +12,25 @@ export default function FacultyAdvisor() {
 
   // ================= FETCH ADVISOR =================
   const fetchAdvisor = async () => {
-    const res = await fetch(`http://localhost:5000/fa/${faId}`);
+    const res = await fetch(`http://localhost:5001/fa/${faId}`);
     const data = await res.json();
     if (res.ok) setAdvisor(data);
   };
 
   const fetchRequests = async () => {
-    const res = await fetch(`http://localhost:5000/fa/${faId}/requests`);
+    const res = await fetch(`http://localhost:5001/fa/${faId}/requests`);
     const data = await res.json();
     if (res.ok) setRequests(data);
   };
 
   const fetchStudents = async () => {
-    const res = await fetch(`http://localhost:5000/fa/${faId}/students`);
+    const res = await fetch(`http://localhost:5001/fa/${faId}/students`);
     const data = await res.json();
     if (res.ok) setStudents(data);
   };
 
   const fetchHistory = async () => {
-    const res = await fetch(`http://localhost:5000/fa/${faId}/history`);
+    const res = await fetch(`http://localhost:5001/fa/${faId}/history`);
     const data = await res.json();
     if (res.ok) setHistory(data);
   };
@@ -48,7 +48,7 @@ export default function FacultyAdvisor() {
 
   // ================= DECISION =================
   const handleDecision = async (req, decision) => {
-    await fetch("http://localhost:5000/fa/decision", {
+    await fetch("http://localhost:5001/fa/decision", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

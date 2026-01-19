@@ -9,7 +9,7 @@ export default function CoursesOffered() {
   // Fetch all courses
   useEffect(() => {
     async function fetchCourses() {
-      const res = await fetch("http://localhost:5000/courses");
+      const res = await fetch("http://localhost:5001/courses");
       const data = await res.json();
 
       if (res.ok) {

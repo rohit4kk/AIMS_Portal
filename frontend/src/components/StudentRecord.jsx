@@ -8,7 +8,7 @@ export default function StudentRecord() {
   useEffect(() => {
     async function fetchRecord() {
       const res = await fetch(
-        `http://localhost:5000/student/${studentId}/record`
+        `http://localhost:5001/student/${studentId}/record`
       );
       const data = await res.json();
 

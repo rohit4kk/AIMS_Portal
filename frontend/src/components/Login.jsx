@@ -9,7 +9,7 @@ export default function Login() {
   const generateOtp = async () => {
     setMessage("");
 
-    const res = await fetch("http://localhost:5000/generate-otp", {
+    const res = await fetch("http://localhost:5001/generate-otp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -31,7 +31,7 @@ export default function Login() {
   const verifyOtp = async () => {
   setMessage("");
 
-  const res = await fetch("http://localhost:5000/verify-otp", {
+  const res = await fetch("http://localhost:5001/verify-otp", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

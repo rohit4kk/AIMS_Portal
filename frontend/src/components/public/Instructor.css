@@ -1,0 +1,72 @@
+.instructor-container {
+  padding: 40px 40px 40px 20px;
+  width: 100%;
+}
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-course-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Courses section */
+.courses-heading {
+  margin-top: 40px;
+}
+
+.courses-list {
+  margin-top: 20px;
+}
+
+.course-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 15px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background-color: grey;
+  border-radius: 6px;
+}
+
+.course-card:hover {
+  background-color: black;
+}
+
+
+.top-bar-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.logout-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
+
+
+
+@media (max-width: 768px) {
+    .top-bar-actions{
+        flex-direction: column-reverse;
+    }
+}
