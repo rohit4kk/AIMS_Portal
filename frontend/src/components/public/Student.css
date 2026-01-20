@@ -197,12 +197,12 @@
 /* Course title */
 .course-card strong {
   font-size: 17px;
-  color: #0d2c44;
+  color: #ffffff;
 }
 
 /* Course details text */
 .course-card {
-  color: #333;
+  color: #f6f1f1;
   line-height: 1.7;
   font-size: 15px;
 }
