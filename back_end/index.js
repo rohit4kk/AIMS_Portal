@@ -287,6 +287,7 @@ app.get("/courses/:courseId/requests", async (req, res) => {
     .select(`
       status,
       students (
+        id,
         name,
         email,
         roll_no
@@ -301,6 +302,7 @@ app.get("/courses/:courseId/requests", async (req, res) => {
 
   // Format response
   const formatted = data.map(row => ({
+    student_id: row.students.id,
     name: row.students.name,
     email: row.students.email,
     roll_no: row.students.roll_no,
@@ -667,7 +669,60 @@ app.get("/student/:studentId/record", async (req, res) => {
   res.json(grouped);
 });
 
+// ================= DROP COURSE =================
+app.delete("/courses/:courseId/drop", async (req, res) => {
+  const { courseId } = req.params;
+  const { studentId } = req.body;
 
+  if (!studentId) {
+    return res.status(400).json({ error: "Student ID required" });
+  }
+
+  // Check if record exists
+  const { data: existing, error } = await supabase
+    .from("takes")
+    .select("status")
+    .eq("student_id", studentId)
+    .eq("course_id", courseId)
+    .limit(1);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Database error" });
+  }
+
+  if (!existing || existing.length === 0) {
+    return res.status(400).json({
+      error: "You are not enrolled in this course"
+    });
+  }
+
+  const allowedStatuses = [
+    "ENROLLED",
+    "PENDING_INSTRUCTOR_APPROVAL",
+    "PENDING_ADVISOR_APPROVAL"
+  ];
+
+  if (!allowedStatuses.includes(existing[0].status)) {
+    return res.status(400).json({
+      error: "Course cannot be dropped at this stage"
+    });
+  }
+
+  // Delete the record
+  const { error: deleteError } = await supabase
+    .from("takes")
+    .delete()
+    .eq("student_id", studentId)
+    .eq("course_id", courseId);
+
+  if (deleteError) {
+    console.error(deleteError);
+    return res.status(500).json({ error: "Failed to drop course" });
+  }
+
+  res.json({ message: "Course dropped successfully" });
+});
 
 app.listen(5001, () => {
   console.log("AIMS backend running on port 5001");
