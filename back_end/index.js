@@ -468,13 +468,13 @@ app.get("/fa/:faId/requests", async (req, res) => {
       student_id,
       course_id,
       semester,
-      students (
+      students!inner (
         name,
         email,
         fa_id,
         roll_no
       ),
-      courses (
+      courses!inner (
         title,
         credits
       )
@@ -514,13 +514,13 @@ app.get("/fa/:faId/history", async (req, res) => {
     .select(`
       status,
       semester,
-      students (
+      students!inner (
         name,
         roll_no,
         email,
         fa_id
       ),
-      courses (
+      courses!inner (
         title
       )
     `)
