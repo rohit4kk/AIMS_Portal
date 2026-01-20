@@ -16,7 +16,7 @@ export default function App() {
           path="/instructor/course/:courseId"
           element={<InstructorCourseDetails />}
         />
-        <Route path="/fa" element={<FacultyAdvisor />} />
+        <Route path="/fa/*" element={<FacultyAdvisor />} />
       </Routes>
     </BrowserRouter>
   );

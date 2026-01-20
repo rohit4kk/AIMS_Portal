@@ -8,6 +8,11 @@ export default function FacultyAdvisor() {
   const [students, setStudents] = useState([]);
   const [history, setHistory] = useState([]);
   const [view, setView] = useState("APPROVALS");
+
+  if (!faId) {
+  return <p>Unauthorized</p>;
+}
+
   // APPROVALS | STUDENTS | HISTORY
 
   // ================= FETCH ADVISOR =================
@@ -79,16 +84,25 @@ export default function FacultyAdvisor() {
         </button>
       </div>
 
-      {/* APPROVALS */}
       {view === "APPROVALS" &&
-        requests.map(req => (
-          <div key={`${req.student_id}-${req.course_id}`} style={card}>
-            <p><b>{req.students.name}</b> ({req.students.roll_no})</p>
-            <p>{req.courses.title} – {req.semester}</p>
-            <button onClick={() => handleDecision(req, "APPROVE")}>Approve</button>
-            <button onClick={() => handleDecision(req, "REJECT")}>Reject</button>
-          </div>
-        ))}
+  requests.map(req => (
+    <div key={`${req.student_id}-${req.course_id}`} style={card}>
+      <p>
+        <b>{req.students?.name}</b>
+        {" "}({req.students?.roll_no})
+      </p>
+      <p>
+        {req.courses?.title} – {req.semester}
+      </p>
+      <button onClick={() => handleDecision(req, "APPROVE")}>
+        Approve
+      </button>
+      <button onClick={() => handleDecision(req, "REJECT")}>
+        Reject
+      </button>
+    </div>
+  ))}
+
 
       {/* STUDENTS */}
       {view === "STUDENTS" && (
@@ -117,8 +131,8 @@ export default function FacultyAdvisor() {
           <tbody>
             {history.map((h, i) => (
               <tr key={i}>
-                <td>{h.students.name}</td>
-                <td>{h.courses.title}</td>
+                <td>{h.students?.name}</td>
+                <td>{h.courses?.title}</td>
                 <td>{h.semester}</td>
                 <td style={{ color: h.status === "ENROLLED" ? "green" : "red" }}>
                   {h.status === "ENROLLED" ? "APPROVED" : "REJECTED"}
