@@ -20,31 +20,31 @@ export default function StudentHome() {
   }, [studentId]);
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div className="student-content">
       <h3>Hi {studentName}</h3>
 
-      <div style={{ marginTop: "40px", maxWidth: "800px" }}>
-        <h2>Academic Information Management System.</h2>
+      <h2>Academic Information Management System.</h2>
 
-        <p style={{ color: "red", fontWeight: "bold" }}>
-          Please DO NOT edit or manipulate the URLs or requests when using
-          this application. Doing so may lock your account.
-        </p>
+      <div className="student-warning">
+        Please DO NOT edit or manipulate the URLs or requests when using
+        this application. Doing so may lock your account.
+      </div>
 
-        <p>
-          Please proceed by choosing a menu item from the top bar.
-        </p>
+      <p className="student-text">
+        Please proceed by choosing a menu item from the top bar.
+      </p>
 
-        <p>
-          Before contacting @aims_help for any issues, please check the{" "}
-          <a href="#">User Guide</a> for solution.
-        </p>
+      <p className="student-text">
+        Before contacting @aims_help for any issues, please check the{" "}
+        <a href="#">User Guide</a> for solution.
+      </p>
 
-        <p><strong>NOTE:</strong></p>
+      <div className="student-note">
+        <strong>NOTE:</strong>
         <ul>
           <li>
-            Please directly contact the course instructor for any changes to
-            your enrolment requests.
+            Please directly contact the course instructor for any changes
+            to your enrolment requests.
           </li>
           <li>
             We have not yet fully imported your past enrolments data into

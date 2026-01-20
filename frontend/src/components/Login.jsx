@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./Login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -6,95 +7,160 @@ export default function Login() {
   const [step, setStep] = useState(1);
   const [message, setMessage] = useState("");
 
+  const [loadingOtp, setLoadingOtp] = useState(false);
+  const [loadingLogin, setLoadingLogin] = useState(false);
+
+  const [resendTimer, setResendTimer] = useState(0);
+
+  const startResendTimer = (seconds = 30) => {
+    setResendTimer(seconds);
+    const interval = setInterval(() => {
+      setResendTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   const generateOtp = async () => {
-    setMessage("");
-
-    const res = await fetch("http://localhost:5000/generate-otp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setMessage(data.error || "Failed to generate OTP");
+    if (!email) {
+      setMessage("Please enter email first");
       return;
     }
 
-    setMessage("OTP sent to your email");
-    setStep(2);
+    setMessage("");
+    setLoadingOtp(true);
+
+    try {
+      const res = await fetch("http://localhost:5000/generate-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.error || "Failed to generate OTP");
+        return;
+      }
+
+      setMessage("OTP sent to your email");
+      setStep(2);
+      startResendTimer(30);
+    } catch (err) {
+      setMessage("Server not reachable");
+    } finally {
+      setLoadingOtp(false);
+    }
   };
 
   const verifyOtp = async () => {
-  setMessage("");
+    if (!otp) {
+      setMessage("Please enter OTP");
+      return;
+    }
 
-  const res = await fetch("http://localhost:5000/verify-otp", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, otp })
-  });
+    setMessage("");
+    setLoadingLogin(true);
 
-  const data = await res.json();
+    try {
+      const res = await fetch("http://localhost:5000/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, otp })
+      });
 
-  if (!res.ok) {
-    setMessage(data.error || "Invalid OTP");
-    return;
-  }
+      const data = await res.json();
 
-  // ✅ STORE USER ID AFTER SUCCESSFUL LOGIN
-  localStorage.setItem("userId", data.userId);
-  localStorage.setItem("role", data.role);
+      if (!res.ok) {
+        setMessage(data.error || "Invalid OTP");
+        return;
+      }
 
-  // Redirect based on role
-  if (data.role === "STUDENT") window.location.href = "/student";
-  if (data.role === "INSTRUCTOR") window.location.href = "/instructor";
-  if (data.role === "FACULTY_ADVISOR") window.location.href = "/fa";
-};
+      // ✅ STORE USER DATA
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("role", data.role);
+
+      if (data.role === "STUDENT") window.location.href = "/student";
+      if (data.role === "INSTRUCTOR") window.location.href = "/instructor";
+      if (data.role === "FACULTY_ADVISOR") window.location.href = "/fa";
+    } catch (err) {
+      setMessage("Server not reachable");
+    } finally {
+      setLoadingLogin(false);
+    }
+  };
 
   return (
-    <div style={{ padding: "40px", maxWidth: "400px", margin: "auto" }}>
-      <h2>AIMS Login</h2>
+    <div className="login-wrapper">
+      <div className="login-card">
+        <h2>AIMS Login</h2>
 
-      {step === 1 && (
-        <>
-          <input
-            type="email"
-            placeholder="Enter institute email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            style={{ width: "100%", padding: "10px" }}
-          />
-          <br /><br />
-          <button onClick={generateOtp} style={{ width: "100%" }}>
-            Generate OTP
-          </button>
-        </>
-      )}
+        {step === 1 && (
+          <>
+            <input
+              type="email"
+              placeholder="Enter institute email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="login-input"
+              disabled={loadingOtp}
+            />
 
-      {step === 2 && (
-        <>
-          <input
-            type="text"
-            placeholder="Enter OTP"
-            value={otp}
-            onChange={e => setOtp(e.target.value)}
-            style={{ width: "100%", padding: "10px" }}
-          />
-          <br /><br />
-          <button onClick={verifyOtp} style={{ width: "100%" }}>
-            Login
-          </button>
-        </>
-      )}
+            <button
+              onClick={generateOtp}
+              className="login-btn"
+              disabled={loadingOtp}
+            >
+              {loadingOtp ? "Sending OTP..." : "Generate OTP"}
+            </button>
+          </>
+        )}
 
-      {message && (
-        <p style={{ marginTop: "20px", color: "red" }}>{message}</p>
-      )}
+        {step === 2 && (
+          <>
+            <input
+              type="text"
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={e => setOtp(e.target.value)}
+              className="login-input"
+              disabled={loadingLogin}
+            />
+
+            <button
+              onClick={verifyOtp}
+              className="login-btn"
+              disabled={loadingLogin}
+            >
+              {loadingLogin ? "Logging in..." : "Login"}
+            </button>
+
+            <button
+              onClick={generateOtp}
+              className="login-btn resend-btn"
+              disabled={resendTimer > 0 || loadingOtp}
+              style={{ marginTop: "10px" }}
+            >
+              {resendTimer > 0
+                ? `Resend OTP in ${resendTimer}s`
+                : loadingOtp
+                ? "Sending OTP..."
+                : "Resend OTP"}
+            </button>
+          </>
+        )}
+
+        {message && <p className="login-message">{message}</p>}
+      </div>
     </div>
   );
 }

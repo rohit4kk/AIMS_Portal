@@ -6,7 +6,6 @@ export default function CoursesOffered() {
   const [search, setSearch] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(null);
 
-  // Fetch all courses
   useEffect(() => {
     async function fetchCourses() {
       const res = await fetch("http://localhost:5000/courses");
@@ -22,13 +21,12 @@ export default function CoursesOffered() {
     fetchCourses();
   }, []);
 
-  // Filter by course code
   const filteredCourses = courses.filter(course =>
     course.course_id.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div className="student-content">
       <h2>Courses Offered</h2>
 
       {/* SEARCH BAR */}
@@ -38,15 +36,14 @@ export default function CoursesOffered() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         style={{
-          width: "300px",
+          width: "320px",
           padding: "10px",
-          marginTop: "20px",
-          marginBottom: "20px"
+          margin: "20px 0"
         }}
       />
 
       {/* COURSE LIST */}
-      <div>
+      <div className="courses-list">
         {filteredCourses.length === 0 && (
           <p>No courses found.</p>
         )}
@@ -55,28 +52,21 @@ export default function CoursesOffered() {
           <div
             key={course.course_id}
             onClick={() => setSelectedCourse(course)}
-
-            style={{
-              border: "1px solid #ccc",
-              padding: "15px",
-              marginBottom: "10px",
-              cursor: "pointer"
-            }}
+            className="course-card"
           >
-            <strong>{course.course_id}</strong> — {course.title}  
+            <strong>{course.course_id}</strong> — {course.title}
             <br />
             Department: {course.department} | Credits: {course.credits}
           </div>
         ))}
       </div>
-        {selectedCourse && (
+
+      {selectedCourse && (
         <CourseModal
           course={selectedCourse}
           onClose={() => setSelectedCourse(null)}
         />
-        )}
-
-
+      )}
     </div>
   );
 }
