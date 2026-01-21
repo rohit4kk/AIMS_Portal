@@ -101,6 +101,7 @@ export default function Login() {
       if (data.role === "STUDENT") window.location.href = "/student";
       if (data.role === "INSTRUCTOR") window.location.href = "/instructor";
       if (data.role === "FACULTY_ADVISOR") window.location.href = "/fa";
+      if (data.role === "ADMIN") window.location.href = "/admin";
     } catch (err) {
       setMessage("Server not reachable");
     } finally {

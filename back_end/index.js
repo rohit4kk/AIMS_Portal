@@ -197,14 +197,14 @@ app.get("/instructor/:id/courses", async (req, res) => {
   const { data, error } = await supabase
     .from("teaches")
     .select(`
-      semester,
-      courses (
-        course_id,
-        title,
-        credits,
-        department
-      )
-    `)
+  semester,
+  courses!teaches_course_fkey (
+    course_id,
+    title,
+    credits,
+    department
+  )
+`)
     .eq("instructor_id", id);
 
   if (error) {
@@ -276,14 +276,14 @@ app.get("/courses", async (req, res) => {
   const { data, error } = await supabase
     .from("teaches")
     .select(`
-      semester,
-      courses (
-        course_id,
-        title,
-        department,
-        credits
-      )
-    `);
+  semester,
+  courses!teaches_course_fkey (
+    course_id,
+    title,
+    department,
+    credits
+  )
+`);
 
   if (error) {
     console.error(error);
@@ -318,7 +318,8 @@ app.get("/courses/:courseId/requests", async (req, res) => {
         roll_no
       )
     `)
-    .eq("course_id", courseId);
+    .eq("course_id", courseId)
+    // .eq("semester", semester)
 
   if (error) {
     console.error(error);
@@ -641,6 +642,153 @@ app.post("/instructor/course/:courseId/grade", async (req, res) => {
   res.json({ message: "Grade updated" });
 });
 
+
+
+app.post("/admin/add-student", async (req, res) => {
+  const { id, name, email, department, year, roll_no, fa_id } = req.body;
+
+  // 🔹 Basic validation
+  if (!id || !name || !email || !department || !year || !roll_no || !fa_id) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // 1️⃣ CHECK IF USER ALREADY EXISTS (ID OR EMAIL)
+    const { data: existingUser, error: checkError } = await supabase
+      .from("users")
+      .select("id")
+      .or(`id.eq.${id},email.eq.${email}`)
+      .limit(1);
+
+    if (checkError) {
+      console.error("Check user error:", checkError);
+      return res.status(500).json({ error: "Database error while checking user" });
+    }
+
+    if (existingUser && existingUser.length > 0) {
+      return res.status(400).json({
+        error: "User with this ID or email already exists"
+      });
+    }
+
+    // 2️⃣ INSERT INTO USERS TABLE
+    const { error: userError } = await supabase.from("users").insert({
+      id,
+      email,
+      role: "STUDENT"
+    });
+
+    if (userError) {
+      console.error("User insert error:", userError);
+      return res.status(500).json({ error: "Failed to create user" });
+    }
+
+    // 3️⃣ INSERT INTO STUDENTS TABLE
+    const { error: studentError } = await supabase.from("students").insert({
+      id,
+      name,
+      email,
+      department,
+      year,
+      roll_no,
+      fa_id
+    });
+
+    if (studentError) {
+      console.error("Student insert error:", studentError);
+
+      // 🔁 ROLLBACK USERS TABLE (VERY IMPORTANT)
+      await supabase.from("users").delete().eq("id", id);
+
+      return res.status(500).json({
+        error: "Failed to create student, user rollback completed"
+      });
+    }
+
+    // ✅ SUCCESS
+    res.json({ message: "Student added successfully" });
+
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+//  ADD INSTURCTOR
+app.post("/admin/add-instructor", async (req, res) => {
+  const { id, name, email, department } = req.body;
+
+  if (!id || !name || !email || !department) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
+
+  const { error: userError } = await supabase.from("users").insert({
+    id,
+    email,
+    role: "INSTRUCTOR"
+  });
+
+  if (userError) {
+    return res.status(400).json({ error: "User already exists" });
+  }
+
+  const { error: instructorError } = await supabase
+    .from("instructors")
+    .insert({ id, name, email, department });
+
+  if (instructorError) {
+    return res.status(500).json({ error: "Failed to add instructor" });
+  }
+
+  res.json({ message: "Instructor added successfully" });
+});
+
+
+// ADD FACULTY ADVISOR
+
+app.post("/admin/add-fa", async (req, res) => {
+  const { id, name, email, department } = req.body;
+
+  if (!id || !name || !email || !department) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
+
+  const { error: userError } = await supabase.from("users").insert({
+    id,
+    email,
+    role: "FACULTY_ADVISOR"
+  });
+
+  if (userError) {
+    return res.status(400).json({ error: "User already exists" });
+  }
+
+  const { error: faError } = await supabase
+    .from("faculty_advisors")
+    .insert({ id, name, email, department });
+
+  if (faError) {
+    return res.status(500).json({ error: "Failed to add FA" });
+  }
+
+  res.json({ message: "Faculty Advisor added successfully" });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ================= STUDENT ACADEMIC RECORD =================
 app.get("/student/:studentId/record", async (req, res) => {
   const { studentId } = req.params;
@@ -648,16 +796,16 @@ app.get("/student/:studentId/record", async (req, res) => {
   const { data, error } = await supabase
     .from("takes")
     .select(`
-      semester,
-      status,
-      grade,
-      courses (
-        course_id,
-        title,
-        credits,
-        department
-      )
-    `)
+  semester,
+  status,
+  grade,
+  courses!takes_course_fkey (
+    course_id,
+    title,
+    credits,
+    department
+  )
+`)
     .eq("student_id", studentId)
     .order("semester", { ascending: false });
 

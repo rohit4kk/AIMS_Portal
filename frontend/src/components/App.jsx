@@ -6,6 +6,9 @@ import Instructor from "./Instructor";
 import FacultyAdvisor from "./FacultyAdvisor";
 import InstructorCourseDetails from "./InstructorCourseDetails";
 import ProtectedRoute from "./ProtectedRoute";
+import Admin from "./Admin";
+
+
 
 export default function App() {
   useEffect(() => {
@@ -56,6 +59,15 @@ export default function App() {
           element={
             <ProtectedRoute allowedRole="FACULTY_ADVISOR">
               <FacultyAdvisor />
+            </ProtectedRoute>
+          }
+        />
+         {/* ✅ Admin Route Added */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <Admin />
             </ProtectedRoute>
           }
         />
