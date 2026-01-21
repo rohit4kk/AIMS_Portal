@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import "./public/Login.css";
 
 export default function Login() {
@@ -11,6 +11,15 @@ export default function Login() {
   const [loadingLogin, setLoadingLogin] = useState(false);
 
   const [resendTimer, setResendTimer] = useState(0);
+
+  useEffect(() => {
+  const role = localStorage.getItem("role");
+
+  if (role === "STUDENT") window.location.href = "/student";
+  if (role === "INSTRUCTOR") window.location.href = "/instructor";
+  if (role === "FACULTY_ADVISOR") window.location.href = "/fa";
+}, []);
+
 
   const startResendTimer = (seconds = 30) => {
     setResendTimer(seconds);
