@@ -157,7 +157,8 @@ app.post("/instructor/add-course", async (req, res) => {
         course_id,
         title,
         department,
-        credits
+        credits,
+        semester
       });
 
     if (courseError) {

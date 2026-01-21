@@ -41,7 +41,7 @@ export default function Student() {
             Logout
           </button>
 
-        {/* HAMBURGER (MOBILE) */}
+        {/*(MOBILE) */}
         <div
           className="hamburger mobile-only"
           onClick={() => setMenuOpen(!menuOpen)}
