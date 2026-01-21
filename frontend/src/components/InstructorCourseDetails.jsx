@@ -13,6 +13,58 @@ export default function InstructorCourseDetails() {
   const [requests, setRequests] = useState([]);
   const [showGrade, setShowGrade] = useState(false);
 
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selectedStudents, setSelectedStudents] = useState({});
+
+  const handleApproveAllClick = () => {
+  const initialSelection = {};
+  requests.forEach(req => {
+    initialSelection[req.student_id] = true;
+  });
+  setSelectedStudents(initialSelection);
+  setBulkMode(true);
+  };
+
+  const toggleStudent = (studentId) => {
+  setSelectedStudents(prev => ({
+    ...prev,
+    [studentId]: !prev[studentId]
+  }));
+};
+
+const submitBulkApprove = async () => {
+  const approvedIds = Object.keys(selectedStudents).filter(
+    id => selectedStudents[id]
+  );
+
+  if (approvedIds.length === 0) {
+    alert("No students selected");
+    return;
+  }
+
+  const res = await fetch(
+    `http://localhost:5001/instructor/course/${courseId}/approve-bulk`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentIds: approvedIds })
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error);
+    return;
+  }
+
+  setBulkMode(false);
+  setSelectedStudents({});
+  fetchRequests();
+};
+
+
+
   const fetchRequests = async () => {
     const res = await fetch(
       `http://localhost:5001/instructor/course/${courseId}/requests`
@@ -84,6 +136,23 @@ export default function InstructorCourseDetails() {
         >
           Give Grade
         </button>
+        <button
+          className="give-grade-btn"
+          onClick={handleApproveAllClick}
+          disabled={requests.length === 0}
+        >
+          Approve All
+        </button>
+
+        {bulkMode && (
+          <button
+            className="give-grade-btn"
+            onClick={submitBulkApprove}
+          >
+            Submit Approval
+          </button>
+        )}
+
       </div>
 
       <h2>
@@ -110,40 +179,56 @@ export default function InstructorCourseDetails() {
         <table className="requests-table">
           <thead>
             <tr>
+              {bulkMode && <th>Select</th>}
               <th>Student Name</th>
               <th>Roll Number</th>
               <th>Email</th>
               <th>Department</th>
               <th>Year</th>
-              <th>Action</th>
+              {!bulkMode && <th>Action</th>}
             </tr>
           </thead>
+
           <tbody>
             {requests.map(req => (
               <tr key={req.student_id}>
+                {bulkMode && (
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={!!selectedStudents[req.student_id]}
+                      onChange={() => toggleStudent(req.student_id)}
+                    />
+                  </td>
+                )}
+
                 <td>{req.name}</td>
                 <td>{req.roll_no}</td>
                 <td>{req.email}</td>
                 <td>{req.department}</td>
                 <td>{req.email.substring(0, 4)}</td>
-                <td className="action-cell">
-                  <button
-                    className="approve-btn"
-                    onClick={() => handleApprove(req.student_id)}
-                  >
-                    Approve
-                  </button>
 
-                  <button
-                    className="reject-btn"
-                    onClick={() => handleReject(req.student_id)}
-                  >
-                    Reject
-                  </button>
-                </td>
+                {!bulkMode && (
+                  <td className="action-cell">
+                    <button
+                      className="approve-btn"
+                      onClick={() => handleApprove(req.student_id)}
+                    >
+                      Approve
+                    </button>
+
+                    <button
+                      className="reject-btn"
+                      onClick={() => handleReject(req.student_id)}
+                    >
+                      Reject
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
+
         </table>
       )}
     </div>

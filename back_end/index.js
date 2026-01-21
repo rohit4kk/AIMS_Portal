@@ -224,6 +224,30 @@ app.get("/instructor/:id/courses", async (req, res) => {
   res.json(formatted);
 });
 
+//For bulk approval by instructor
+app.post("/instructor/course/:courseId/approve-bulk", async (req, res) => {
+  const { courseId } = req.params;
+  const { studentIds } = req.body;
+
+  if (!Array.isArray(studentIds) || studentIds.length === 0) {
+    return res.status(400).json({ error: "No students selected" });
+  }
+
+  const { error } = await supabase
+    .from("takes")
+    .update({ status: "PENDING_ADVISOR_APPROVAL" })
+    .eq("course_id", courseId)
+    .in("student_id", studentIds)
+    .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to approve requests" });
+  }
+
+  res.json({ message: "Selected requests approved" });
+});
+
 // Student information
 app.get("/student/:id", async (req, res) => {
   const { id } = req.params;
