@@ -1,0 +1,160 @@
+/* ================= FACULTY ADVISOR SCOPE ================= */
+.fa-scope {
+  background-color: #1e1e1e;
+  color: #eaeaea;
+  min-height: 100vh;
+  padding: 40px;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+/* ================= HEADINGS ================= */
+.fa-scope h2 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ================= BUTTON BASE ================= */
+.fa-scope button {
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ================= TOP ACTION BUTTONS ================= */
+.fa-scope .view-btn {
+  background-color: #2e2e2e;
+  color: #ffffff;
+  padding: 10px 18px;
+  margin-right: 10px;
+  transition: background 0.2s ease;
+}
+
+.fa-scope .view-btn:hover {
+  background-color: #3a3a3a;
+}
+
+/* ================= LOGOUT ================= */
+.fa-scope .logout-btn {
+  background-color: transparent;
+  border: 1px solid #ff5a5a;
+  color: #ff5a5a;
+  padding: 10px 20px;
+  margin-left: 20px;
+}
+
+.fa-scope .logout-btn:hover {
+  background-color: #ff5a5a;
+  color: #000;
+}
+
+/* ================= BULK ACTIONS ================= */
+.fa-scope .bulk-actions {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.fa-scope .approve-btn {
+  background-color: #2e7d32;
+  color: white;
+  padding: 10px 18px;
+}
+
+.fa-scope .approve-btn:hover {
+  background-color: #388e3c;
+}
+
+.fa-scope .reject-btn {
+  background-color: #c62828;
+  color: white;
+  padding: 10px 18px;
+}
+
+.fa-scope .reject-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* ================= TABLE WRAPPER ================= */
+.fa-scope .table-wrapper {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+/* ================= TABLE ================= */
+.fa-scope table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  color: #222;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fa-scope thead {
+  background-color: #f1f1f1;
+}
+
+.fa-scope th,
+.fa-scope td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.fa-scope th {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.fa-scope tbody tr:hover {
+  background-color: #f6f6f6;
+}
+
+/* ================= ACTION BUTTONS IN TABLE ================= */
+.fa-scope td button {
+  padding: 6px 12px;
+  margin-right: 6px;
+  font-size: 13px;
+}
+
+/* ================= STATUS COLORS ================= */
+.fa-scope .status-approved {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.fa-scope .status-rejected {
+  color: #c62828;
+  font-weight: 600;
+}
+
+/* ================= EMPTY STATES ================= */
+.fa-scope p {
+  color: #cfcfcf;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .fa-scope {
+    padding: 20px;
+  }
+
+  .fa-scope h2 {
+    font-size: 22px;
+  }
+
+  .fa-scope .bulk-actions {
+    flex-direction: column;
+  }
+
+  .fa-scope th,
+  .fa-scope td {
+    padding: 10px;
+    font-size: 13px;
+  }
+}

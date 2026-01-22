@@ -1094,6 +1094,39 @@ app.post("/admin/add-fa", async (req, res) => {
 });
 
 
+// ================= FA BULK APPROVE / REJECT =================
+app.post("/fa/decision-bulk", async (req, res) => {
+  const { requests, decision } = req.body;
+
+  if (!Array.isArray(requests) || requests.length === 0) {
+    return res.status(400).json({ error: "No requests provided" });
+  }
+
+  const newStatus =
+    decision === "APPROVE"
+      ? "ENROLLED"
+      : "REJECTED_BY_ADVISOR";
+
+  try {
+    await Promise.all(
+      requests.map(r =>
+        supabase
+          .from("takes")
+          .update({ status: newStatus })
+          .match({
+            student_id: r.student_id,
+            course_id: r.course_id,
+            semester: r.semester
+          })
+      )
+    );
+
+    res.json({ message: "Bulk decision completed" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Bulk decision failed" });
+  }
+});
 
 
 

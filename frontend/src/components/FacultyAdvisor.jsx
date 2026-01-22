@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./public/FacultyAdvisor.css";
 
 export default function FacultyAdvisor() {
   const faId = localStorage.getItem("userId");
@@ -74,19 +75,40 @@ export default function FacultyAdvisor() {
     fetchRequests();
   };
 
+
+  const handleBulkDecision = async (decision) => {
+  if (requests.length === 0) return;
+
+  await fetch("http://localhost:5001/fa/decision-bulk", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      decision,
+      requests: requests.map(r => ({
+        student_id: r.student_id,
+        course_id: r.course_id,
+        semester: r.semester
+      }))
+    })
+  });
+
+  fetchRequests();
+};
+
+
   return (
     <div style={{ padding: "40px" }}>
       <h2>{advisor ? `Welcome ${advisor.name}` : "Loading..."}</h2>
 
       {/* BUTTONS */}
       <div style={{ margin: "20px 0" }}>
-        <button style={btn(view === "APPROVALS")} onClick={() => setView("APPROVALS")}>
+        <button className="view-btn" style={btn(view === "APPROVALS")} onClick={() => setView("APPROVALS")}>
           Pending Approvals
         </button>
-        <button style={btn(view === "STUDENTS")} onClick={() => setView("STUDENTS")}>
+        <button className="view-btn" style={btn(view === "STUDENTS")} onClick={() => setView("STUDENTS")}>
           My Students
         </button>
-        <button style={btn(view === "HISTORY")} onClick={() => setView("HISTORY")}>
+        <button className="view-btn" style={btn(view === "HISTORY")} onClick={() => setView("HISTORY")}>
           History
         </button>
         <button
@@ -97,24 +119,63 @@ export default function FacultyAdvisor() {
         </button>
       </div>
 
-      {view === "APPROVALS" &&
-  requests.map(req => (
-    <div key={`${req.student_id}-${req.course_id}`} style={card}>
-      <p>
-        <b>{req.students?.name}</b>
-        {" "}({req.students?.roll_no})
-      </p>
-      <p>
-        {req.courses?.title} – {req.semester}
-      </p>
-      <button onClick={() => handleDecision(req, "APPROVE")}>
-        Approve
+      {view === "APPROVALS" && (
+  <>
+    {/* BULK BUTTONS */}
+    <div className="bulk-actions">
+      <button
+        className="approve-btn"
+        disabled={requests.length === 0}
+        onClick={() => handleBulkDecision("APPROVE")}
+      >
+        Accept All
       </button>
-      <button onClick={() => handleDecision(req, "REJECT")}>
-        Reject
+
+      <button
+        className="reject-btn"
+        disabled={requests.length === 0}
+        onClick={() => handleBulkDecision("REJECT")}
+      >
+        Reject All
       </button>
     </div>
-  ))}
+
+    {/* TABLE */}
+    <div className="table-wrapper">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Roll No</th>
+            <th>Course</th>
+            <th>Semester</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {requests.map(req => (
+            <tr key={`${req.student_id}-${req.course_id}`}>
+              <td>{req.students.name}</td>
+              <td>{req.students.roll_no}</td>
+              <td>{req.courses.title}</td>
+              <td>{req.semester}</td>
+              <td>
+                <button onClick={() => handleDecision(req, "APPROVE")}>
+                  Approve
+                </button>
+                <button onClick={() => handleDecision(req, "REJECT")}>
+                  Reject
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </>
+)}
+
 
 
       {/* STUDENTS */}
