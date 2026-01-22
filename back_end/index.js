@@ -117,6 +117,65 @@ app.post("/verify-otp", async (req, res) => {
 });
 
 
+// GET /instructor/search-courses?prefix=CS
+app.get("/instructor/search-courses", async (req, res) => {
+  const { prefix } = req.query;
+
+  console.log("PREFIX RECEIVED:", prefix);
+
+  if (!prefix) {
+    return res.status(400).json({ error: "Prefix required" });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("courses")
+      .select("*") // TEMP: select everything to debug
+      .ilike("course_id", `${prefix}%`)
+      .limit(10);
+
+    if (error) {
+      console.error("🔥 SUPABASE ERROR OBJECT 🔥");
+      console.error(error); // <-- THIS is key
+      return res.status(500).json({ error: error.message });
+    }
+
+    console.log("DATA RETURNED:", data);
+    res.json(data);
+  } catch (err) {
+    console.error("🔥 SERVER ERROR 🔥", err);
+    res.status(500).json({ error: "Server crash" });
+  }
+});
+
+// POST /instructor/add-course-eligibility
+app.post("/instructor/add-course-eligibility", async (req, res) => {
+  const { course_id, semester, eligibility } = req.body;
+
+  if (!course_id || !semester || !eligibility?.length) {
+    return res.status(400).json({ error: "Invalid data" });
+  }
+
+  const rows = eligibility.map(e => ({
+    course_id,
+    semester,
+    branch: e.branch,
+    entry_year: e.entry_year
+  }));
+
+  const { error } = await supabase
+    .from("course_eligibility")
+    .insert(rows);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.json({ success: true });
+});
+
+
 //for instructor details
 app.get("/instructor/:id", async (req, res) => {
   const { id } = req.params;
@@ -140,20 +199,16 @@ app.get("/instructor/:id", async (req, res) => {
 });
 
 app.post("/instructor/add-course", async (req, res) => {
-  const { title, course_id,credits, semester, department, instructorId } = req.body;
+  const { course_id, semester, instructorId } = req.body;
 
-  // Basic validation
-  if (!title || !course_id || !credits || !semester || !department || !instructorId) {
+  // ✅ Correct validation
+  if (!course_id || !semester || !instructorId) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
-   
-
-    
-
-    // 3️⃣ Insert into TEACHES table
-    const { error: teachesError } = await supabase
+    // Insert into TEACHES table
+    const { error } = await supabase
       .from("teaches")
       .insert({
         instructor_id: instructorId,
@@ -161,21 +216,22 @@ app.post("/instructor/add-course", async (req, res) => {
         semester
       });
 
-    if (teachesError) {
-      console.error(teachesError);
-      return res.status(500).json({ error: "Failed to assign course" });
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: error.message });
     }
 
     res.json({
-      message: "Course added successfully",
-      course_id
+      message: "Course offering added successfully",
+      course_id,
+      semester
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 app.get("/instructor/:id/courses", async (req, res) => {
   const { id } = req.params;
@@ -948,6 +1004,8 @@ app.post("/admin/add-fa", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
 
 
 
