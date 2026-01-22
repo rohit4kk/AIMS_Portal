@@ -468,6 +468,33 @@ app.post("/courses/:courseId/enroll", async (req, res) => {
       .status(400)
       .json({ error: "Already enrolled or request exists" });
   }
+  // 1️⃣ Fetch student info
+const { data: student, error: studentError } = await supabase
+  .from("students")
+  .select("department, year")
+  .eq("id", studentId)
+  .single();
+
+if (studentError || !student) {
+  return res.status(400).json({ error: "Student not found" });
+}
+
+// 2️⃣ Check eligibility
+const { data: eligible } = await supabase
+  .from("course_eligibility")
+  .select("course_id")
+  .eq("course_id", courseId)
+  .eq("semester", semester)
+  .eq("branch", student.department)
+  .eq("entry_year", student.year)
+  .limit(1);
+
+// ❌ Not eligible
+if (!eligible || eligible.length === 0) {
+  return res.status(403).json({
+    error: "You are not eligible for this course"
+  });
+}
 
   // Insert enrollment request
   const { error } = await supabase.from("takes").insert({

@@ -7,6 +7,6 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    open: true, // optional: opens browser automatically
+    // open: true, // optional: opens browser automatically
   },
 })
