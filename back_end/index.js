@@ -175,6 +175,67 @@ app.post("/instructor/add-course-eligibility", async (req, res) => {
   res.json({ success: true });
 });
 
+// GET existing eligibility for a course offering
+app.get("/instructor/course/:courseId/eligibility", async (req, res) => {
+  const { courseId } = req.params;
+  const { semester } = req.query; // pass semester as query
+
+  if (!semester) {
+    return res.status(400).json({ error: "Semester required" });
+  }
+
+  const { data, error } = await supabase
+    .from("course_eligibility")
+    .select("branch, entry_year")
+    .eq("course_id", courseId)
+    .eq("semester", semester);
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.json(data);
+});
+
+
+// UPDATE eligibility (replace old with new)
+app.put("/instructor/course/:courseId/eligibility", async (req, res) => {
+  const { courseId } = req.params;
+  const { semester, eligibility } = req.body;
+
+  if (!semester || !eligibility?.length) {
+    return res.status(400).json({ error: "Invalid data" });
+  }
+
+  try {
+   
+
+    // Insert new eligibility
+    const rows = eligibility.map(e => ({
+      course_id: courseId,
+      semester,
+      branch: e.branch,
+      entry_year: e.entry_year
+    }));
+
+    const { error: insertError } = await supabase
+      .from("course_eligibility")
+      .insert(rows);
+
+    if (insertError) {
+      console.error(insertError);
+      return res.status(500).json({ error: insertError.message });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 
 //for instructor details
 app.get("/instructor/:id", async (req, res) => {

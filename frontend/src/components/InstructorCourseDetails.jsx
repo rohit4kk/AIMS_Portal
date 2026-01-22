@@ -129,6 +129,16 @@ const submitBulkApprove = async () => {
         >
           Home
         </button>
+        <button
+          className="give-grade-btn"
+          onClick={() =>
+            navigate(`/instructor/course/${courseId}/edit`, {
+              state: course
+            })
+          }
+        >
+          Edit Course
+        </button>
 
         <button
           className="give-grade-btn"

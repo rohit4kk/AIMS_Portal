@@ -9,6 +9,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Admin from "./Admin";
 import AddCourse from "./AddCourse";
 import InstructorCoursesOffered from "./InstructorCoursesOffered";
+import EditCourse from "./EditCourse";
 
 
 
@@ -62,7 +63,10 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/instructor/course/:courseId/edit"
+          element={<EditCourse />}
+        />
         <Route
           path="/fa/*"
           element={
