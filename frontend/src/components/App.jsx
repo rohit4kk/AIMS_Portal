@@ -7,6 +7,8 @@ import FacultyAdvisor from "./FacultyAdvisor";
 import InstructorCourseDetails from "./InstructorCourseDetails";
 import ProtectedRoute from "./ProtectedRoute";
 import Admin from "./Admin";
+import AddCourse from "./AddCourse";
+import InstructorCoursesOffered from "./InstructorCoursesOffered";
 
 
 
@@ -43,6 +45,13 @@ export default function App() {
               <Instructor />
             </ProtectedRoute>
           }
+        />
+         <Route path="/instructor/add-course" element={<AddCourse />} />
+
+        
+        <Route
+          path="/instructor/courses-offered"
+          element={<InstructorCoursesOffered />}
         />
 
         <Route

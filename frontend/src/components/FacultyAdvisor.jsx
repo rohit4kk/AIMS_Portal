@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function FacultyAdvisor() {
   const faId = localStorage.getItem("userId");
@@ -8,6 +9,12 @@ export default function FacultyAdvisor() {
   const [students, setStudents] = useState([]);
   const [history, setHistory] = useState([]);
   const [view, setView] = useState("APPROVALS");
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+  localStorage.clear(); // or removeItem("userId")
+  navigate("/", { replace: true });
+  };
 
   if (!faId) {
   return <p>Unauthorized</p>;
@@ -81,6 +88,12 @@ export default function FacultyAdvisor() {
         </button>
         <button style={btn(view === "HISTORY")} onClick={() => setView("HISTORY")}>
           History
+        </button>
+        <button
+              className="logout-btn"
+              onClick={handleLogout}
+            >
+              Logout
         </button>
       </div>
 
