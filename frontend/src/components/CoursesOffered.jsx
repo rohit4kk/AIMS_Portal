@@ -6,6 +6,8 @@ export default function CoursesOffered() {
   const [search, setSearch] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(null);
 
+
+
   useEffect(() => {
     async function fetchCourses() {
       const res = await fetch("http://localhost:5001/courses");
@@ -31,16 +33,20 @@ export default function CoursesOffered() {
 
       {/* SEARCH BAR */}
       <input
+        id="course-search"
+        name="courseSearch"
         type="text"
         placeholder="Search by course code (e.g. CS101)"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        autoComplete="off"
         style={{
           width: "320px",
           padding: "10px",
           margin: "20px 0"
         }}
       />
+
 
       {/* COURSE LIST */}
       <div className="courses-list">
