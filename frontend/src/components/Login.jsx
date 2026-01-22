@@ -18,6 +18,7 @@ export default function Login() {
   if (role === "STUDENT") window.location.href = "/student";
   if (role === "INSTRUCTOR") window.location.href = "/instructor";
   if (role === "FACULTY_ADVISOR") window.location.href = "/fa";
+  if(role === "ADMIN") window.location.href = "/admin";
 }, []);
 
 
