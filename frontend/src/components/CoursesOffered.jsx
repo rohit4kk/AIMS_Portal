@@ -50,17 +50,19 @@ export default function CoursesOffered() {
 
         {filteredCourses.map(course => (
           <div
-            key={course.course_id}
+            key={`${course.course_id}-${course.semester}-${course.instructor_name}`}
             onClick={() => setSelectedCourse(course)}
             className="course-card"
           >
             <strong>{course.course_id}</strong> — {course.title}
             <br />
+            Professor: {course.instructor_name}
+            <br />
             Department: {course.department} | Credits: {course.credits}
           </div>
         ))}
-      </div>
 
+      </div>
       {selectedCourse && (
         <CourseModal
           course={selectedCourse}

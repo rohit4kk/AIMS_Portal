@@ -150,21 +150,7 @@ app.post("/instructor/add-course", async (req, res) => {
   try {
    
 
-    // 2️ Insert into COURSES table
-    const { error: courseError } = await supabase
-      .from("courses")
-      .insert({
-        course_id,
-        title,
-        department,
-        credits,
-        semester
-      });
-
-    if (courseError) {
-      console.error(courseError);
-      return res.status(500).json({ error: "Failed to create course" });
-    }
+    
 
     // 3️⃣ Insert into TEACHES table
     const { error: teachesError } = await supabase
@@ -282,6 +268,9 @@ app.get("/courses", async (req, res) => {
         title,
         department,
         credits
+      ),
+      instructors (
+        name
       )
     `);
 
@@ -290,17 +279,19 @@ app.get("/courses", async (req, res) => {
     return res.status(500).json({ error: "Failed to fetch courses" });
   }
 
-  // flatten response
+  // Flatten response
   const formatted = data.map(row => ({
     course_id: row.courses.course_id,
     title: row.courses.title,
     department: row.courses.department,
     credits: row.courses.credits,
-    semester: row.semester
+    semester: row.semester,
+    instructor_name: row.instructors.name
   }));
 
   res.json(formatted);
 });
+
 
 
 // Enrollment requests for a course
