@@ -97,91 +97,87 @@ export default function EditCourse() {
 
     navigate(-1); // go back to course details
   };
+
   return (
     <div className="course-form">
-      <div className="course-form-container">
-        <div className="form-header">
-          <h2>Edit Course Offering</h2>
-          <p className="form-subtitle">Update course details and eligibility</p>
+      <h3>Edit Course Offering</h3>
+
+      {/* READ-ONLY COURSE */}
+      <input
+        value={`${course.course_id} - ${course.title}`}
+        disabled
+        className="course-input"
+        style={{backgroundColor:"black",color:"white",marginBottom:"10px"}}
+      />
+
+      {/* SEMESTER (read-only for now) */}
+      <input value={semester} disabled className="course-input" style={{backgroundColor:"black",color:"white"}} />
+
+      {/* ELIGIBILITY */}
+      <div className="eligibility-section">
+        <h4>Course Eligibility</h4>
+
+        <div className="eligibility-inputs">
+          <select
+            value={branch}
+            onChange={(e) => setBranch(e.target.value)}
+          >
+            <option value="">Branch</option>
+            <option value="CSE">CSE</option>
+            <option value="ECE">ECE</option>
+            <option value="ME">ME</option>
+            <option value="CE">CE</option>
+          </select>
+
+          <input
+            className="custom-input"
+            type="number"
+            placeholder="Year(eg. 2023)"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            min="1"
+          />
+          <style>
+            {`
+              .custom-input::placeholder {
+                color: white;
+                opacity: 1;
+              }
+            `}
+          </style>
+
+          <button onClick={addEligibility}>✓</button>
         </div>
 
-        {/* READ-ONLY COURSE */}
-        <div className="form-section">
-          <h4>Course Information</h4>
-          <div className="form-group">
-            <label>Course</label>
-            <input
-              value={`${course.course_id} - ${course.title}`}
-              disabled
-              className="course-input"
-            />
-          </div>
+        {eligibility.length > 0 && (
+          <table className="eligibility-table">
+            <thead>
+              <tr>
+                <th>Branch</th>
+                <th>Year</th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              {eligibility.map((e, index) => (
+                <tr key={index}>
+                  <td>{e.branch}</td>
+                  <td>{e.entry_year}</td>
+                  <td>
+                    <button onClick={() => removeEligibility(index)}>
+                      ❌
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
-          <div className="form-group">
-            <label>Semester</label>
-            <input value={semester} disabled className="course-input" />
-          </div>
-        </div>
-
-        {/* ELIGIBILITY */}
-        <div className="form-section">
-          <div className="eligibility-section">
-            <h4>Course Eligibility</h4>
-
-            <div className="eligibility-inputs">
-              <select
-                value={branch}
-                onChange={(e) => setBranch(e.target.value)}
-              >
-                <option value="">Branch</option>
-                <option value="CSE">CSE</option>
-                <option value="ECE">ECE</option>
-                <option value="ME">ME</option>
-                <option value="CE">CE</option>
-              </select>
-
-              <input
-                type="number"
-                placeholder="Year(eg. 2023)"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                min="1"
-              />
-
-              <button className="add-btn" onClick={addEligibility}>✓</button>
-            </div>
-
-            {eligibility.length > 0 && (
-              <table className="eligibility-table">
-                <thead>
-                  <tr>
-                    <th>Branch</th>
-                    <th>Year</th>
-                    <th>Remove</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {eligibility.map((e, index) => (
-                    <tr key={index}>
-                      <td>{e.branch}</td>
-                      <td>{e.entry_year}</td>
-                      <td>
-                        <button onClick={() => removeEligibility(index)}>
-                          ❌
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
-
-        <div className="course-form-actions">
-          <button onClick={handleSave}>Save Changes</button>
-          <button onClick={() => navigate(-1)}>Cancel</button>
-        </div>
+      <div className="course-form-actions">
+        <button onClick={handleSave}>Save Changes</button>
+        <button onClick={() => navigate(-1)}>Cancel</button>
       </div>
     </div>
   );

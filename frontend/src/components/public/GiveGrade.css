@@ -7,6 +7,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
 }
 
 /* Buttons */
@@ -36,6 +37,8 @@
   border-collapse: collapse;
 }
 
+
+
 .grade-table th,
 .grade-table td {
   border: 1px solid #ccc;
@@ -44,7 +47,11 @@
 }
 
 .grade-table th {
-  background-color: grey;
+  background-color: black;
+  color: white;
+}
+.grade-table td{
+  color: black;
 }
 
 /* Select */
@@ -67,4 +74,65 @@
     align-items: flex-start;
     gap: 10px;
   }
+}
+
+
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .give-grade-container {
+    padding: 12px;
+  }
+
+  /* Header stacks nicely */
+  .give-grade-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .close-btn {
+    align-self: flex-end;
+  }
+
+  /* Make table scrollable instead of squeezing */
+  .grade-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-collapse: collapse;
+  }
+
+  /* Slightly smaller text */
+  .grade-table th,
+  .grade-table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  /* Improve select box for touch */
+  .grade-select {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  /* Buttons full-width for easy tapping */
+  .submit-btn,
+  .update-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* Add spacing between buttons */
+  .grade-table td:last-child {
+    min-width: 120px;
+  }
+
+  
+  .grade-table th:nth-child(4),
+.grade-table td:nth-child(4) {
+  min-width: 110px;
+}
 }

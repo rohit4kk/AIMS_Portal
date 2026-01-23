@@ -1,41 +1,66 @@
 /* ================= FACULTY ADVISOR SCOPE ================= */
 .fa-scope {
-  background-color: #1e1e1e;
-  color: #eaeaea;
+  background-color: white;
+  color: black;
   min-height: 100vh;
-  padding: 40px;
   box-sizing: border-box;
   font-family: "Segoe UI", Tahoma, sans-serif;
+  
+}
+
+.fa-nav-bar{
+  background-color: black;
+  display: flex;
+  height: 3.8rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.fa-nav-bar div {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.fa-nav-bar h2 {
+  margin: 0;
+  color: white !important;
+  font-size: 1.5rem !important;
+  padding-top: 10px;
+}
+.fa-nav-bar-left{
+  display: flex;
+  gap: 1rem;
 }
 
 /* ================= HEADINGS ================= */
 .fa-scope h2 {
-  margin-top: 0;
+  margin-top: 10px;
   margin-bottom: 24px;
   font-size: 28px;
   font-weight: 600;
-  color: #ffffff;
+  color: black;
 }
 
-/* ================= BUTTON BASE ================= */
-.fa-scope button {
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-}
 
 /* ================= TOP ACTION BUTTONS ================= */
-.fa-scope .view-btn {
-  background-color: #2e2e2e;
-  color: #ffffff;
-  padding: 10px 18px;
-  margin-right: 10px;
-  transition: background 0.2s ease;
+.view-btn {
+  background: transparent;
+  border: 1px solid #fff;
+  color: white;
+  padding: 12px 26px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
-.fa-scope .view-btn:hover {
-  background-color: #3a3a3a;
+
+
+/* Hover */
+.view-btn:hover {
+  background: white;
+  color: black;
 }
 
 /* ================= LOGOUT ================= */
@@ -128,6 +153,7 @@
   font-weight: 600;
 }
 
+
 .fa-scope .status-rejected {
   color: #c62828;
   font-weight: 600;
@@ -135,7 +161,7 @@
 
 /* ================= EMPTY STATES ================= */
 .fa-scope p {
-  color: #cfcfcf;
+  color: #999;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -148,6 +174,12 @@
     font-size: 22px;
   }
 
+  /* Buttons wrap nicely on mobile */
+  .fa-scope .view-btn,
+  .fa-scope .logout-btn {
+    margin-bottom: 10px;
+  }
+
   .fa-scope .bulk-actions {
     flex-direction: column;
   }
@@ -158,3 +190,4 @@
     font-size: 13px;
   }
 }
+

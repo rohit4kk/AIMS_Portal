@@ -3,10 +3,15 @@ import CourseModal from "./CourseModal";
 
 export default function CoursesOffered() {
   const [courses, setCourses] = useState([]);
-  const [search, setSearch] = useState("");
+  const [filteredCourses, setFilteredCourses] = useState([]);
+
+  // 🔎 filters
+  const [codeSearch, setCodeSearch] = useState("");
+  const [deptFilter, setDeptFilter] = useState("");
+  const [titleFilter, setTitleFilter] = useState("");
+  const [semesterFilter, setSemesterFilter] = useState("");
+
   const [selectedCourse, setSelectedCourse] = useState(null);
-
-
 
   useEffect(() => {
     async function fetchCourses() {
@@ -15,6 +20,7 @@ export default function CoursesOffered() {
 
       if (res.ok) {
         setCourses(data);
+        setFilteredCourses(data);
       } else {
         console.error(data.error);
       }
@@ -23,52 +29,126 @@ export default function CoursesOffered() {
     fetchCourses();
   }, []);
 
-  const filteredCourses = courses.filter(course =>
-    course.course_id.toLowerCase().includes(search.toLowerCase())
-  );
+  // 🔍 SEARCH HANDLER
+  const handleSearch = () => {
+    let result = courses;
+
+    if (codeSearch) {
+      result = result.filter(c =>
+        c.course_id.toLowerCase().includes(codeSearch.toLowerCase())
+      );
+    }
+
+    if (deptFilter) {
+      result = result.filter(c =>
+        c.department.toLowerCase() === deptFilter.toLowerCase()
+      );
+    }
+
+    if (titleFilter) {
+      result = result.filter(c =>
+        c.title.toLowerCase().includes(titleFilter.toLowerCase())
+      );
+    }
+
+    if (semesterFilter) {
+      result = result.filter(c => c.semester === semesterFilter);
+    }
+
+    setFilteredCourses(result);
+  };
 
   return (
     <div className="student-content">
       <h2>Courses Offered</h2>
 
-      {/* SEARCH BAR */}
-      <input
-        id="course-search"
-        name="courseSearch"
-        type="text"
-        placeholder="Search by course code (e.g. CS101)"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        autoComplete="off"
-        style={{
-          width: "320px",
-          padding: "10px",
-          margin: "20px 0"
-        }}
-      />
+      {/* ================= SEARCH & FILTER BAR ================= */}
+      <div className="course-filter-bar">
+        <input
+          className="course-filter-input"
+          type="text"
+          placeholder="Course Code (e.g. CS101)"
+          value={codeSearch}
+          onChange={(e) => setCodeSearch(e.target.value)}
+        />
+        <style>
+            {`
+              .course-filter-input::placeholder {
+                color: white;
+                opacity: 1;
+              }
+            `}
+          </style>
 
+        <select
+          className="course-filter-select"
+          value={deptFilter}
+          onChange={(e) => setDeptFilter(e.target.value)}
+        >
+          <option value="">Offering Department</option>
+          <option value="CSE">CSE</option>
+          <option value="ECE">ECE</option>
+          <option value="ME">ME</option>
+        </select>
 
-      {/* COURSE LIST */}
+        <input
+          className="course-filter-input"
+          type="text"
+          placeholder="Course Title"
+          value={titleFilter}
+          onChange={(e) => setTitleFilter(e.target.value)}
+        />
+        <style>
+            {`
+              .course-filter-input::placeholder {
+                color: white;
+                opacity: 1;
+              }
+            `}
+          </style>
+
+        <select
+          className="course-filter-select"
+          value={semesterFilter}
+          onChange={(e) => setSemesterFilter(e.target.value)}
+        >
+          <option value="">Semester</option>
+          <option value="2025-I">2025-I</option>
+          <option value="2025-II">2025-II</option>
+        </select>
+
+        <button
+          className="course-search-btn"
+          onClick={handleSearch}
+          title="Search"
+          style={{backgroundColor:"#3EBB9E"}}
+        >
+          🔍
+        </button>
+      </div>
+
+      {/* ================= COURSE LIST ================= */}
       <div className="courses-list">
-        {filteredCourses.length === 0 && (
-          <p>No courses found.</p>
-        )}
+        {filteredCourses.length === 0 && <p>No courses found.</p>}
 
         {filteredCourses.map(course => (
           <div
             key={`${course.course_id}-${course.semester}-${course.instructor_name}`}
-            onClick={() => setSelectedCourse(course)}
             className="course-card"
+            onClick={() => setSelectedCourse(course)}
           >
             <strong>{course.course_id}</strong> — {course.title}
-            <br />
-            Professor: {course.instructor_name}
-            <br />
-            Department: {course.department} | Credits: {course.credits}
+
+            <div className="course-meta">
+              <div><b>Semester:</b> {course.semester}</div>
+              <div><b>Instructor:</b> {course.instructor_name}</div>
+              <div><b>Department:</b> {course.department}</div>
+              <div><b>L-P-T-S-C:</b> {course.ltpsc ?? "NA"}</div>
+            </div>
           </div>
         ))}
-
       </div>
+
       {selectedCourse && (
         <CourseModal
           course={selectedCourse}

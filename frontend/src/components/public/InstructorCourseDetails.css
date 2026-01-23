@@ -1,5 +1,5 @@
-.course-details-container {
-  padding: 40px;
+.course-details-container h2,p,h3{
+  color: black;
 }
 
 .give-grade-btn {
@@ -12,9 +12,26 @@
   display: flex;
   gap: 12px;
   margin-bottom: 15px;
+  align-items: center;
+  background-color: black;
 }
 
+.top-actions button{
+  background: transparent;
+  border: 1px solid #fff;
+  color: white;
+  padding: 12px 26px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-top: 10px;
+}
 
+.top-actions button:hover{
+  background: white;
+  color: black;
+}
 
 /* Table styles */
 .requests-table {
@@ -31,8 +48,11 @@
 }
 
 .requests-table th {
-  background-color: grey;
+  background-color: black;
   color: white;
+}
+.requests-table tr{
+  color: black;
 }
 
 .action-cell {
@@ -71,3 +91,68 @@
     align-items: stretch;
   }
 }
+
+
+/* Wrapper */
+.top-actions-wrapper {
+  margin-bottom: 20px;
+}
+
+/* Hamburger button */
+.actions-hamburger {
+  background-color: black;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: fit-content;
+  margin-bottom: 10px;
+}
+
+/* Default actions layout (desktop) */
+.top-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Mobile behavior */
+@media (max-width: 768px) {
+  .top-actions {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    background-color: black;
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .top-actions.open {
+    display: flex;
+  }
+}
+
+/* TABLE SCROLL CONTAINER */
+.requests-table-wrapper {
+  width: 100%;
+  overflow-x: auto;      /* horizontal scroll */
+  overflow-y: hidden;
+}
+
+/* Prevent columns from shrinking */
+.requests-table {
+  min-width: 900px;      /* adjust if needed */
+  border-collapse: collapse;
+}
+
+/* Optional: smoother scrolling on mobile */
+.requests-table-wrapper {
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .requests-table-wrapper {
+    overflow-x: auto;
+  }
+}
+

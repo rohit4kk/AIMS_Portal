@@ -9,21 +9,25 @@ export default function FacultyAdvisor() {
   const [requests, setRequests] = useState([]);
   const [students, setStudents] = useState([]);
   const [history, setHistory] = useState([]);
+
   const [view, setView] = useState("APPROVALS");
+
+  // 🔽 BULK STATES
+  const [bulkMode, setBulkMode] = useState(false);
+  const [bulkDecision, setBulkDecision] = useState(null);
+  const [selected, setSelected] = useState({});
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
-  localStorage.clear(); // or removeItem("userId")
-  navigate("/", { replace: true });
+    localStorage.clear();
+    navigate("/", { replace: true });
   };
 
-  if (!faId) {
-  return <p>Unauthorized</p>;
-}
+  if (!faId) return <p>Unauthorized</p>;
 
-  // APPROVALS | STUDENTS | HISTORY
+  /* ================= FETCH ================= */
 
-  // ================= FETCH ADVISOR =================
   const fetchAdvisor = async () => {
     const res = await fetch(`http://localhost:5001/fa/${faId}`);
     const data = await res.json();
@@ -48,18 +52,15 @@ export default function FacultyAdvisor() {
     if (res.ok) setHistory(data);
   };
 
-  // ================= LOAD DATA =================
   useEffect(() => {
-    if (!faId) return;
-
     fetchAdvisor();
-
     if (view === "APPROVALS") fetchRequests();
     if (view === "STUDENTS") fetchStudents();
     if (view === "HISTORY") fetchHistory();
-  }, [faId, view]);
+  }, [view]);
 
-  // ================= DECISION =================
+  /* ================= SINGLE DECISION ================= */
+
   const handleDecision = async (req, decision) => {
     await fetch("http://localhost:5001/fa/decision", {
       method: "POST",
@@ -75,158 +76,211 @@ export default function FacultyAdvisor() {
     fetchRequests();
   };
 
+  /* ================= BULK START ================= */
 
-  const handleBulkDecision = async (decision) => {
-  if (requests.length === 0) return;
+  const startBulk = (decision) => {
+    const init = {};
+    requests.forEach(r => {
+      init[`${r.student_id}-${r.course_id}`] = true;
+    });
 
-  await fetch("http://localhost:5001/fa/decision-bulk", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      decision,
-      requests: requests.map(r => ({
-        student_id: r.student_id,
-        course_id: r.course_id,
-        semester: r.semester
-      }))
-    })
-  });
+    setSelected(init);
+    setBulkDecision(decision);
+    setBulkMode(true);
+  };
 
-  fetchRequests();
-};
+  /* ================= BULK SUBMIT ================= */
 
+  const submitBulk = async () => {
+    const chosen = requests.filter(
+      r => selected[`${r.student_id}-${r.course_id}`]
+    );
+
+    if (chosen.length === 0) {
+      alert("No entries selected");
+      return;
+    }
+
+    await fetch("http://localhost:5001/fa/decision-bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        decision: bulkDecision,
+        requests: chosen.map(r => ({
+          student_id: r.student_id,
+          course_id: r.course_id,
+          semester: r.semester
+        }))
+      })
+    });
+
+    setBulkMode(false);
+    setBulkDecision(null);
+    setSelected({});
+    fetchRequests();
+  };
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h2>{advisor ? `Welcome ${advisor.name}` : "Loading..."}</h2>
+    <div className="fa-scope">
 
-      {/* BUTTONS */}
-      <div style={{ margin: "20px 0" }}>
-        <button className="view-btn" style={btn(view === "APPROVALS")} onClick={() => setView("APPROVALS")}>
-          Pending Approvals
+      {/* ===== NAV BAR ===== */}
+      <nav className="fa-nav-bar">
+        <div>
+          <h2>AIMS</h2>
+          <button className="view-btn" onClick={() => setView("APPROVALS")}>
+            Home
+          </button>
+          <button className="view-btn" onClick={() => setView("STUDENTS")}>
+            My Students
+          </button>
+          <button className="view-btn" onClick={() => setView("HISTORY")}>
+            History
+          </button>
+        </div>
+
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
         </button>
-        <button className="view-btn" style={btn(view === "STUDENTS")} onClick={() => setView("STUDENTS")}>
-          My Students
-        </button>
-        <button className="view-btn" style={btn(view === "HISTORY")} onClick={() => setView("HISTORY")}>
-          History
-        </button>
-        <button
-              className="logout-btn"
-              onClick={handleLogout}
-            >
-              Logout
-        </button>
+      </nav>
+      <div style={{padding:"15px"}}>
+        {/* ===== APPROVALS ===== */}
+        {view === "APPROVALS" && (
+          <>
+            <h2>{advisor ? `Welcome ${advisor.name}` : "Loading..."}</h2>
+
+            <div className="bulk-actions">
+              <button
+                className="approve-btn"
+                disabled={requests.length === 0}
+                onClick={() => startBulk("APPROVE")}
+              >
+                Accept All
+              </button>
+
+              <button
+                className="reject-btn"
+                disabled={requests.length === 0}
+                onClick={() => startBulk("REJECT")}
+              >
+                Reject All
+              </button>
+            </div>
+
+            <div className="table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    {bulkMode && <th>Select</th>}
+                    <th>Student Name</th>
+                    <th>Roll No</th>
+                    <th>Course</th>
+                    <th>Semester</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {requests.map(req => {
+                    const key = `${req.student_id}-${req.course_id}`;
+                    return (
+                      <tr key={key}>
+                        {bulkMode && (
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={!!selected[key]}
+                              onChange={() =>
+                                setSelected(prev => ({
+                                  ...prev,
+                                  [key]: !prev[key]
+                                }))
+                              }
+                            />
+                          </td>
+                        )}
+
+                        <td>{req.students.name}</td>
+                        <td>{req.students.roll_no}</td>
+                        <td>{req.courses.title}</td>
+                        <td>{req.semester}</td>
+
+                        <td>
+                          {!bulkMode && (
+                            <>
+                              <button onClick={() => handleDecision(req, "APPROVE")} style={{backgroundColor:"#2e7d32"}}>
+                                Approve
+                              </button>
+                              <button onClick={() => handleDecision(req, "REJECT")} style={{backgroundColor: "#c62828"}}>
+                                Reject
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {bulkMode && (
+              <button
+                className="approve-btn"
+                style={{ marginTop: "16px" }}
+                onClick={submitBulk}
+              >
+                Submit
+              </button>
+            )}
+          </>
+        )}
+
+        {/* ===== STUDENTS ===== */}
+        {view === "STUDENTS" && (
+          <table style={table}>
+            <thead>
+              <tr><th>Name</th><th>Roll</th><th>Email</th></tr>
+            </thead>
+            <tbody>
+              {students.map(s => (
+                <tr key={s.id}>
+                  <td>{s.name}</td>
+                  <td>{s.roll_no}</td>
+                  <td>{s.email}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {/* ===== HISTORY ===== */}
+        {view === "HISTORY" && (
+          <table style={table}>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Decision</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map((h, i) => (
+                <tr key={i}>
+                  <td>{h.students?.name}</td>
+                  <td>{h.courses?.title}</td>
+                  <td>{h.semester}</td>
+                  <td style={{ color: h.status === "ENROLLED" ? "green" : "red" }}>
+                    {h.status === "ENROLLED" ? "APPROVED" : "REJECTED"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
-
-      {view === "APPROVALS" && (
-  <>
-    {/* BULK BUTTONS */}
-    <div className="bulk-actions">
-      <button
-        className="approve-btn"
-        disabled={requests.length === 0}
-        onClick={() => handleBulkDecision("APPROVE")}
-      >
-        Accept All
-      </button>
-
-      <button
-        className="reject-btn"
-        disabled={requests.length === 0}
-        onClick={() => handleBulkDecision("REJECT")}
-      >
-        Reject All
-      </button>
-    </div>
-
-    {/* TABLE */}
-    <div className="table-wrapper">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Roll No</th>
-            <th>Course</th>
-            <th>Semester</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {requests.map(req => (
-            <tr key={`${req.student_id}-${req.course_id}`}>
-              <td>{req.students.name}</td>
-              <td>{req.students.roll_no}</td>
-              <td>{req.courses.title}</td>
-              <td>{req.semester}</td>
-              <td>
-                <button onClick={() => handleDecision(req, "APPROVE")}>
-                  Approve
-                </button>
-                <button onClick={() => handleDecision(req, "REJECT")}>
-                  Reject
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </>
-)}
-
-
-
-      {/* STUDENTS */}
-      {view === "STUDENTS" && (
-        <table style={table}>
-          <thead>
-            <tr><th>Name</th><th>Roll</th><th>Email</th></tr>
-          </thead>
-          <tbody>
-            {students.map(s => (
-              <tr key={s.id}>
-                <td>{s.name}</td>
-                <td>{s.roll_no}</td>
-                <td>{s.email}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {/* HISTORY */}
-      {view === "HISTORY" && (
-        <table style={table}>
-          <thead>
-            <tr><th>Student</th><th>Course</th><th>Semester</th><th>Decision</th></tr>
-          </thead>
-          <tbody>
-            {history.map((h, i) => (
-              <tr key={i}>
-                <td>{h.students?.name}</td>
-                <td>{h.courses?.title}</td>
-                <td>{h.semester}</td>
-                <td style={{ color: h.status === "ENROLLED" ? "green" : "red" }}>
-                  {h.status === "ENROLLED" ? "APPROVED" : "REJECTED"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
     </div>
   );
 }
 
-const btn = active => ({
-  marginRight: "10px",
-  padding: "10px",
-  background: active ? "black" : "grey",
-  color: "white",
-  border: "none"
-});
-
-const card = { border: "1px solid #ccc", padding: "10px", marginBottom: "10px" };
 const table = { width: "100%", borderCollapse: "collapse" };
