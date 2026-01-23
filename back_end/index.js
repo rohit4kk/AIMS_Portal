@@ -480,14 +480,15 @@ if (studentError || !student) {
 }
 
 // 2️⃣ Check eligibility
-const { data: eligible } = await supabase
+const { data: eligible, error: eligibilityError } = await supabase
   .from("course_eligibility")
   .select("course_id")
   .eq("course_id", courseId)
   .eq("semester", semester)
-  .eq("branch", student.department)
   .eq("entry_year", student.year)
+  .or(`branch.eq.${student.department},branch.eq.All`)
   .limit(1);
+
 
 // ❌ Not eligible
 if (!eligible || eligible.length === 0) {

@@ -157,6 +157,7 @@ export default function Course_Form({ onClose, onCourseAdded }) {
         <div className="eligibility-inputs">
           <select value={branch} onChange={(e) => setBranch(e.target.value)}>
             <option value="">Branch</option>
+            <option value="All">All</option>
             <option value="CSE">CSE</option>
             <option value="ECE">ECE</option>
             <option value="ME">ME</option>
