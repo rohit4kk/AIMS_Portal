@@ -886,6 +886,135 @@ app.delete("/courses/:courseId/drop", async (req, res) => {
 
 
 
+
+
+// ================= ADMIN: LIST STUDENTS =================
+app.get("/admin/students", async (req, res) => {
+  const { department } = req.query;
+
+  let query = supabase
+    .from("students")
+    .select("name, email, department, roll_no, year");
+
+  if (department) {
+    query = query.eq("department", department);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch students" });
+  }
+
+  res.json(data);
+});
+
+
+
+
+// ================= ADMIN: LIST INSTRUCTORS =================
+app.get("/admin/instructors", async (req, res) => {
+  const { department } = req.query;
+
+  let query = supabase
+    .from("instructors")
+    .select("name, email, department");
+
+  if (department) {
+    query = query.eq("department", department);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch instructors" });
+  }
+
+  res.json(data);
+});
+
+
+
+
+
+
+
+// ================= ADMIN: LIST FACULTY ADVISORS =================
+app.get("/admin/fas", async (req, res) => {
+  const { department } = req.query;
+
+  let query = supabase
+    .from("faculty_advisors")
+    .select("name, email, department");
+
+  if (department) {
+    query = query.eq("department", department);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch faculty advisors" });
+  }
+
+  res.json(data);
+});
+
+
+
+// ================= ADMIN: LIST ALL COURSES =================
+app.get("/admin/courses", async (req, res) => {
+  const { data, error } = await supabase
+    .from("courses")
+    .select("course_id, title, credits, department");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch courses" });
+  }
+
+  res.json(data);
+});
+
+
+
+
+
+// ================= ADMIN: CREATE COURSE =================
+app.post("/admin/create-course", async (req, res) => {
+  const { course_id, title, credits, department,lpts } = req.body;
+
+  if (!course_id || !title || !credits || !department||!lpts) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const { error } = await supabase
+    .from("courses")
+    .insert([
+  {
+    course_id,
+    title,
+    credits: Number(credits),
+    department,
+    "L-P-T-S-C": lpts
+  }
+])
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.json({ message: "Course created successfully" });
+});
+
+
+
+
+
 app.post("/admin/add-student", async (req, res) => {
   const { name, email, department, year, roll_no, fa_email } = req.body;
 

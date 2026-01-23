@@ -1,0 +1,330 @@
+.admin-home-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.admin-home-header {
+  margin-bottom: 32px;
+}
+
+.admin-home-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.admin-home-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* ==================== ADMIN CARDS GRID ==================== */
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.admin-card-btn {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 32px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 200px;
+}
+
+.admin-card-btn:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 12px 32px rgba(79, 70, 229, 0.12);
+  transform: translateY(-4px);
+}
+
+.admin-card-btn::before {
+  content: '';
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-card-btn:nth-child(2)::before {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.admin-card-btn:nth-child(3)::before {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.admin-card-btn:nth-child(4)::before {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+
+.admin-card-btn:nth-child(5)::before {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.admin-card-btn:nth-child(6)::before {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.admin-card-btn-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+}
+
+.admin-card-btn-desc {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* ==================== QUICK STATS SECTION ==================== */
+.admin-stats-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* ---------- LARGE TABLET VIEW (1025px - 1280px) ---------- */
+@media (max-width: 1280px) {
+  .admin-home-header h1 {
+    font-size: 28px;
+  }
+
+  .admin-cards {
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .admin-card-btn {
+    padding: 28px 20px;
+    min-height: 180px;
+  }
+
+  .admin-card-btn-text {
+    font-size: 15px;
+  }
+}
+
+/* ---------- TABLET VIEW (769px - 1024px) ---------- */
+@media (max-width: 1024px) {
+  .admin-home-header {
+    margin-bottom: 24px;
+  }
+
+  .admin-home-header h1 {
+    font-size: 24px;
+  }
+
+  .admin-cards {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .admin-card-btn {
+    padding: 24px 16px;
+    min-height: 160px;
+    gap: 10px;
+  }
+
+  .admin-card-btn::before {
+    width: 40px;
+    height: 40px;
+  }
+
+  .admin-card-btn-text {
+    font-size: 14px;
+  }
+
+  .admin-card-btn-desc {
+    font-size: 11px;
+  }
+
+  .admin-stats-section {
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+}
+
+/* ---------- LARGE MOBILE VIEW (481px - 768px) ---------- */
+@media (max-width: 768px) {
+  .admin-home-container {
+    padding: 0;
+  }
+
+  .admin-home-header {
+    margin-bottom: 20px;
+  }
+
+  .admin-home-header h1 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .admin-home-subtitle {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .admin-cards {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .admin-card-btn {
+    padding: 20px 14px;
+    min-height: 140px;
+    border-radius: 10px;
+    gap: 8px;
+  }
+
+  .admin-card-btn::before {
+    width: 36px;
+    height: 36px;
+  }
+
+  .admin-card-btn-text {
+    font-size: 13px;
+  }
+
+  .admin-card-btn-desc {
+    font-size: 10px;
+  }
+
+  .admin-stats-section {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+}
+
+/* ---------- SMALL MOBILE VIEW (max 480px) ---------- */
+@media (max-width: 480px) {
+  .admin-home-container {
+    padding: 0;
+  }
+
+  .admin-home-header {
+    margin-bottom: 16px;
+  }
+
+  .admin-home-header h1 {
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+
+  .admin-home-subtitle {
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .admin-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .admin-card-btn {
+    padding: 16px 10px;
+    min-height: 120px;
+    border-radius: 8px;
+    gap: 6px;
+  }
+
+  .admin-card-btn::before {
+    width: 32px;
+    height: 32px;
+  }
+
+  .admin-card-btn-text {
+    font-size: 12px;
+  }
+
+  .admin-card-btn-desc {
+    font-size: 9px;
+  }
+
+  .admin-stats-section {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+}
