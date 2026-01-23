@@ -71,6 +71,14 @@ export default function CoursesOffered() {
           value={codeSearch}
           onChange={(e) => setCodeSearch(e.target.value)}
         />
+        <style>
+            {`
+              .course-filter-input::placeholder {
+                color: white;
+                opacity: 1;
+              }
+            `}
+          </style>
 
         <select
           className="course-filter-select"
@@ -90,6 +98,14 @@ export default function CoursesOffered() {
           value={titleFilter}
           onChange={(e) => setTitleFilter(e.target.value)}
         />
+        <style>
+            {`
+              .course-filter-input::placeholder {
+                color: white;
+                opacity: 1;
+              }
+            `}
+          </style>
 
         <select
           className="course-filter-select"
@@ -105,6 +121,7 @@ export default function CoursesOffered() {
           className="course-search-btn"
           onClick={handleSearch}
           title="Search"
+          style={{backgroundColor:"#3EBB9E"}}
         >
           🔍
         </button>

@@ -107,10 +107,11 @@ export default function EditCourse() {
         value={`${course.course_id} - ${course.title}`}
         disabled
         className="course-input"
+        style={{backgroundColor:"black",color:"white",marginBottom:"10px"}}
       />
 
       {/* SEMESTER (read-only for now) */}
-      <input value={semester} disabled className="course-input" />
+      <input value={semester} disabled className="course-input" style={{backgroundColor:"black",color:"white"}} />
 
       {/* ELIGIBILITY */}
       <div className="eligibility-section">
@@ -129,12 +130,21 @@ export default function EditCourse() {
           </select>
 
           <input
+            className="custom-input"
             type="number"
             placeholder="Year(eg. 2023)"
             value={year}
             onChange={(e) => setYear(e.target.value)}
             min="1"
           />
+          <style>
+            {`
+              .custom-input::placeholder {
+                color: white;
+                opacity: 1;
+              }
+            `}
+          </style>
 
           <button onClick={addEligibility}>✓</button>
         </div>

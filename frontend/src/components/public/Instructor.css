@@ -53,7 +53,7 @@
 }
 
 .instructor-container {
-  
+  padding: 15px;
   width: 100%;
 }
 
@@ -147,3 +147,49 @@
         flex-direction: column-reverse;
     }
 }
+
+.desktop-only {
+  display: flex;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    top: 60px;
+    right: 16px;
+    background: rgb(18, 15, 15);
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+  }
+
+  .mobile-menu button {
+    background: none;
+    color: white;
+    border: none;
+    text-align: left;
+    padding: 8px;
+  }
+
+  .logout-mobile {
+    color: #ff4d4d;
+  }
+}
+

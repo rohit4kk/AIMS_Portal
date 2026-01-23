@@ -7,7 +7,7 @@ export default function AddCourse() {
   const navigate = useNavigate();
 
   return (
-    <div className="instructor-container">
+    <div className="instructor-container" style={{padding:"0"}}>
       <nav className="navbar">
         <div className="navbar-left">
           <span className="navbar-title">Add Course</span>

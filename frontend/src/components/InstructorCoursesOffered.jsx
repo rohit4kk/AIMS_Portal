@@ -6,7 +6,7 @@ export default function InstructorCoursesOffered() {
   const navigate = useNavigate();
 
   return (
-    <div className="instructor-container">
+    <div className="instructor-container" style={{padding:"0"}}>
       {/* NAVBAR */}
       <nav className="navbar">
         <div className="navbar-left">
