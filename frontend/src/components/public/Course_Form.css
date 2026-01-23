@@ -1,24 +1,29 @@
 
 .course-form {
   padding: 20px;
-  
+  display: flex;
+  flex-direction: column;
   max-width: 400px;
 }
 
 .course-form h3 {
   margin-bottom: 12px;
+  color: black;
+  font-size: 1.6rem;
 }
 
 /* Input wrapper for autocomplete */
 .course-search-wrapper {
   position: relative;
   width: 100%;
+  
 }
 
 .course-input {
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
+  border-radius: 10px;
 }
 
 /* Suggestions dropdown */
@@ -39,16 +44,19 @@
 
   z-index: 9999;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
 }
 
 .course-suggestion-item {
   padding: 8px;
   cursor: pointer;
   border-bottom: 1px solid #e0e0e0;
+  
+  
 }
 
 .course-suggestion-item:hover {
-  background-color: #e6e6e6;
+  background-color: black;
 }
 
 /* Semester dropdown */
@@ -56,6 +64,7 @@
   width: 100%;
   padding: 8px;
   margin-top: 10px;
+  border-radius: 10px;
 }
 
 /* Course preview */
@@ -69,3 +78,83 @@
   display: flex;
   gap: 10px;
 }
+
+
+.eligibility-section h4{
+  color: black;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.eligibility-inputs {
+  display: flex;
+  gap: 0.3rem;
+  
+}
+
+.eligibility-inputs select{
+  border-radius: 11px;
+}
+.eligibility-inputs input{
+  border-radius: 11px;
+}
+.eligibility-inputs button{
+  border-radius: 11px;
+
+}
+
+/* TABLE CONTAINER */
+.eligibility-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+
+  background-color: grey; /* dark blue */
+  color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* HEADER */
+.eligibility-table thead {
+  background-color: black;
+}
+
+.eligibility-table th {
+  padding: 12px 16px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid #334155;
+}
+
+/* BODY ROWS */
+.eligibility-table td {
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 14px;
+  border-bottom: 1px solid #334155;
+}
+
+
+
+/* REMOVE BUTTON */
+.eligibility-table button {
+  background-color: black;
+  color: black;
+  border: none;
+  border-radius: 6px;
+
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.eligibility-table button:hover {
+  background-color: #b91c1c;
+  transform: scale(1.05);
+}
+

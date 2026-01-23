@@ -384,7 +384,8 @@ app.get("/courses", async (req, res) => {
         course_id,
         title,
         department,
-        credits
+        credits,
+        "L-P-T-S-C"
       ),
       instructors (
         name
@@ -403,6 +404,7 @@ app.get("/courses", async (req, res) => {
     department: row.courses.department,
     credits: row.courses.credits,
     semester: row.semester,
+    ltpsc: row.courses["L-P-T-S-C"],
     instructor_name: row.instructors.name
   }));
 
@@ -448,10 +450,13 @@ app.get("/courses/:courseId/requests", async (req, res) => {
 // Enroll in a course
 app.post("/courses/:courseId/enroll", async (req, res) => {
   const { courseId } = req.params;
-  const { studentId, semester } = req.body;
+  const { studentId, semester,role } = req.body;
 
   if (!studentId || !semester) {
     return res.status(400).json({ error: "Missing required fields" });
+  }
+  if(role!="STUDENT"){
+    return res.status(400).json({error: "Only Students can enroll in the course"});
   }
 
   // Check if already enrolled/requested

@@ -1,5 +1,5 @@
-.course-details-container {
-  padding: 40px;
+.course-details-container h2,p,h3{
+  color: black;
 }
 
 .give-grade-btn {
@@ -12,9 +12,26 @@
   display: flex;
   gap: 12px;
   margin-bottom: 15px;
+  align-items: center;
+  background-color: black;
 }
 
+.top-actions button{
+  background: transparent;
+  border: 1px solid #fff;
+  color: white;
+  padding: 12px 26px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-top: 10px;
+}
 
+.top-actions button:hover{
+  background: white;
+  color: black;
+}
 
 /* Table styles */
 .requests-table {
@@ -31,8 +48,11 @@
 }
 
 .requests-table th {
-  background-color: grey;
+  background-color: black;
   color: white;
+}
+.requests-table tr{
+  color: black;
 }
 
 .action-cell {

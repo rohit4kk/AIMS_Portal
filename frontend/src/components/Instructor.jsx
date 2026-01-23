@@ -49,16 +49,11 @@ export default function Instructor() {
   }, [instructorId]);
 
   return (
-    <div className="instructor-container">
-      {/* NAVBAR */}
+    <div>
       <nav className="navbar">
-        <div className="navbar-left">
-          <span className="navbar-title">
-            {instructor ? `Welcome, ${instructor.name}` : "Loading..."}
-          </span>
-        </div>
 
-        <div className="navbar-right">
+        <div className="navbar-left">
+          <div className="student-logo">AIMS</div>
           <button onClick={() => navigate("/instructor")}>Home</button>
 
           <button onClick={() => navigate("/instructor/courses-offered")}>
@@ -69,38 +64,47 @@ export default function Instructor() {
             Add Course
           </button>
 
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          
         </div>
+        <button className="logout-btn" style={{backgroundColor: "#FF2C2C"}} onClick={handleLogout}>
+            Logout
+        </button>
       </nav>
+      <div className="instructor-container">
+        {/* NAVBAR */}
+        
 
-      {/* COURSES LIST */}
-      <h1 className="courses-heading">YOUR COURSES :</h1>
+        {/* COURSES LIST */}
+        
+          <h1 className="navbar-title" style={{color: "black"}}>
+            {instructor ? `Welcome, ${instructor.name}` : "Loading..."}
+          </h1>
+        <h2 className="courses-heading">YOUR COURSES :</h2>
 
-      <div className="courses-list">
-        {courses.length === 0 && <p>No courses yet</p>}
+        <div className="courses-list">
+          {courses.length === 0 && <p>No courses yet</p>}
 
-        {courses.map((course, index) => (
-          <button
-            key={course.course_id}
-            className="course-card"
-            onClick={() =>
-              navigate(`/instructor/course/${course.course_id}`, {
-                state: course,
-              })
-            }
-          >
-            <strong>
-              {course.course_id} | {course.title}
-            </strong>
-            <br />
-            Credits: {course.credits}
-            <br />
-            Semester: {course.semester}
-          </button>
+          {courses.map((course, index) => (
+            <button
+              key={course.course_id}
+              className="course-card"
+              onClick={() =>
+                navigate(`/instructor/course/${course.course_id}`, {
+                  state: course,
+                })
+              }
+            >
+              <strong>
+                {course.course_id} | {course.title}
+              </strong>
+              <br />
+              Credits: {course.credits}
+              <br />
+              Semester: {course.semester}
+            </button>
 
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -10,11 +10,11 @@ export default function InstructorCoursesOffered() {
       {/* NAVBAR */}
       <nav className="navbar">
         <div className="navbar-left">
-          <span className="navbar-title">Courses Offered</span>
+          <span className="navbar-title" style={{color: "white"}}>Courses Offered</span>
         </div>
 
         <div className="navbar-right">
-          <button onClick={() => navigate("/instructor")}>
+          <button style={{backgroundColor:"grey"}} onClick={() => navigate("/instructor")}>
             Back
           </button>
         </div>

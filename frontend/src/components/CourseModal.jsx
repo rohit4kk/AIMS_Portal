@@ -4,6 +4,7 @@ export default function CourseModal({ course, onClose }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const studentId = localStorage.getItem("userId");
+  const role=localStorage.getItem("role");
 
 
   const fetchRequests = async () => {
@@ -44,7 +45,8 @@ requests.forEach((req, i) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           studentId,
-          semester: course.semester
+          semester: course.semester,
+          role
         })
       }
     );
