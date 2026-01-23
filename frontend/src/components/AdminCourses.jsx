@@ -46,15 +46,19 @@ export default function AdminCourses() {
                   <th>Title</th>
                   <th>Credits</th>
                   <th>Department</th>
+                  <th>L-P-T-S-C</th>
                 </tr>
               </thead>
               <tbody>
                 {courses.map((c) => (
+                  
                   <tr key={c.course_id}>
+                    {console.log(c)}
                     <td data-label="Course Code">{c.course_id}</td>
                     <td data-label="Title">{c.title}</td>
                     <td data-label="Credits">{c.credits}</td>
                     <td data-label="Department">{c.department}</td>
+                    <td data-label="L-P-T-S-C">{c['L-P-T-S-C']}</td>
                   </tr>
                 ))}
               </tbody>

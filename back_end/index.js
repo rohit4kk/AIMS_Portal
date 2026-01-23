@@ -975,13 +975,13 @@ app.get("/admin/fas", async (req, res) => {
 app.get("/admin/courses", async (req, res) => {
   const { data, error } = await supabase
     .from("courses")
-    .select("course_id, title, credits, department");
+    .select("*");
 
   if (error) {
     console.error(error);
     return res.status(500).json({ error: "Failed to fetch courses" });
   }
-
+  console.log(data);
   res.json(data);
 });
 

@@ -115,6 +115,7 @@ export default function CoursesOffered() {
           <option value="">Semester</option>
           <option value="2025-I">2025-I</option>
           <option value="2025-II">2025-II</option>
+          <option value="2025-S">2025-S</option>
         </select>
 
         <button
