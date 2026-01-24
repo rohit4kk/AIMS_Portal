@@ -9,6 +9,9 @@ export default function FacultyAdvisor() {
   const [requests, setRequests] = useState([]);
   const [students, setStudents] = useState([]);
   const [history, setHistory] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentRecord, setStudentRecord] = useState(null);
 
   const [view, setView] = useState("APPROVALS");
 
@@ -51,6 +54,14 @@ export default function FacultyAdvisor() {
     const data = await res.json();
     if (res.ok) setHistory(data);
   };
+  const fetchStudentRecord = async (studentId) => {
+    const res = await fetch(
+      `http://localhost:5001/student/${studentId}/record`
+    );
+    const data = await res.json();
+    if (res.ok) setStudentRecord(data);
+  };
+
 
   useEffect(() => {
     fetchAdvisor();
@@ -125,23 +136,59 @@ export default function FacultyAdvisor() {
 
       {/* ===== NAV BAR ===== */}
       <nav className="fa-nav-bar">
-        <div>
+        {/* LEFT */}
+        <div className="fa-left">
           <h2>AIMS</h2>
-          <button className="view-btn" onClick={() => setView("APPROVALS")}>
-            Home
-          </button>
-          <button className="view-btn" onClick={() => setView("STUDENTS")}>
-            My Students
-          </button>
-          <button className="view-btn" onClick={() => setView("HISTORY")}>
-            History
-          </button>
+
+          {/* DESKTOP NAV */}
+          <div className="desktop-only">
+            <button className="view-btn" onClick={() => setView("APPROVALS")}>
+              Home
+            </button>
+            <button className="view-btn" onClick={() => setView("STUDENTS")}>
+              My Students
+            </button>
+            <button className="view-btn" onClick={() => setView("HISTORY")}>
+              History
+            </button>
+          </div>
         </div>
 
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+        {/* RIGHT */}
+        <div className="fa-right">
+          <button className="logout-btn desktop-only" onClick={handleLogout}>
+            Logout
+          </button>
+
+          <div
+            className="hamburger mobile-only"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            ⋮
+          </div>
+        </div>
+
+        {/* MOBILE MENU */}
+        {menuOpen && (
+          <div className="mobile-menu">
+            <button onClick={() => { setView("APPROVALS"); setMenuOpen(false); }}>
+              Home
+            </button>
+            <button onClick={() => { setView("STUDENTS"); setMenuOpen(false); }}>
+              My Students
+            </button>
+            <button onClick={() => { setView("HISTORY"); setMenuOpen(false); }}>
+              History
+            </button>
+            <hr />
+            <button className="logout-mobile" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        )}
       </nav>
+
+
       <div style={{padding:"15px"}}>
         {/* ===== APPROVALS ===== */}
         {view === "APPROVALS" && (
@@ -237,21 +284,82 @@ export default function FacultyAdvisor() {
 
         {/* ===== STUDENTS ===== */}
         {view === "STUDENTS" && (
-          <table style={table}>
-            <thead>
-              <tr><th>Name</th><th>Roll</th><th>Email</th></tr>
-            </thead>
-            <tbody>
-              {students.map(s => (
-                <tr key={s.id}>
-                  <td>{s.name}</td>
-                  <td>{s.roll_no}</td>
-                  <td>{s.email}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <>
+            {!selectedStudent && (
+              <table style={table}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Roll</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.map(s => (
+                    <tr
+                      key={s.id}
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        setSelectedStudent(s);
+                        fetchStudentRecord(s.id);
+                      }}
+                    >
+                      <td>{s.name}</td>
+                      <td>{s.roll_no}</td>
+                      <td>{s.email}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            {selectedStudent && (
+              <>
+                <button
+                  onClick={() => {
+                    setSelectedStudent(null);
+                    setStudentRecord(null);
+                  }}
+                >
+                  ← Back
+                </button>
+
+                <h3>{selectedStudent.name} – Course Record</h3>
+
+                {!studentRecord && <p>Loading...</p>}
+
+                {studentRecord &&
+                  Object.entries(studentRecord).map(([semester, courses]) => (
+                    <div key={semester} style={{ marginBottom: "20px" }}>
+                      <h4>{semester}</h4>
+
+                      <table style={table}>
+                        <thead>
+                          <tr>
+                            <th>Course</th>
+                            <th>Credits</th>
+                            <th>Status</th>
+                            <th>Grade</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {courses.map(c => (
+                            <tr key={c.course_id}>
+                              <td>{c.course_id} – {c.title}</td>
+                              <td>{c.credits}</td>
+                              <td>{c.status}</td>
+                              <td>{c.grade}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ))}
+              </>
+            )}
+          </>
         )}
+
 
         {/* ===== HISTORY ===== */}
         {view === "HISTORY" && (
