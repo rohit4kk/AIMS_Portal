@@ -15,12 +15,26 @@
   align-items: center;
   justify-content: space-between;
 }
-.fa-nav-bar div {
+.fa-nav-bar {
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 🔥 */
+  padding: 0 16px;
+  height: 3.8rem;
+}
+
+.fa-left {
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex: 1;
 }
+
+.fa-right {
+  display: flex;
+  align-items: center;
+}
+
 
 .fa-nav-bar h2 {
   margin: 0;
@@ -188,6 +202,63 @@
   .fa-scope td {
     padding: 10px;
     font-size: 13px;
+  }
+}
+
+/* ===== MOBILE NAV ===== */
+.desktop-only {
+  display: flex;
+  gap: 10px;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.hamburger {
+  font-size: 22px;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.mobile-menu {
+  position: fixed;          /* 🔥 KEY FIX */
+  top: 3.8rem;              /* just below navbar */
+  right: 16px;
+
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  outline: 2px solid red;
+  z-index: 9999;            /* 🔥 ensure on top */
+}
+
+.mobile-menu button {
+  color: black;          /* 🔥 FIX: visible text */
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px;
+  cursor: pointer;
+}
+
+
+.mobile-menu hr {
+  margin: 6px 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
   }
 }
 
