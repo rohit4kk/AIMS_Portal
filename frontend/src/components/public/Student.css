@@ -228,6 +228,28 @@
   }
 }
 
+/* ================= COURSE ELIGIBILITY ================= */
+
+.eligibility-badge {
+  display: inline-block;
+  margin-right: 6px;
+  margin-top: 4px;
+  padding: 4px 8px;
+
+  background-color: #4d4f51;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+
+  border-radius: 999px;
+}
+
+.eligibility-none {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+
 /* ================= COURSE MODAL ================= */
 
 .course-modal-overlay {
@@ -565,6 +587,25 @@
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
+
+
+.course-filter-input {
+  background-color:rgb(156, 148, 148);
+  color:rgb(156, 148, 148);
+}
+
+/* When user clicks / focuses */
+.course-filter-input:focus {
+  border-color: #4f46e5;   /* blue/purple */
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+/* Placeholder text */
+.course-filter-input::placeholder {
+      color: white;
+      opacity: 1;
+}
+
 
 /* ================= SEARCH BUTTON (LENS) ================= */
 

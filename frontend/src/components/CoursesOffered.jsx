@@ -71,20 +71,14 @@ export default function CoursesOffered() {
           value={codeSearch}
           onChange={(e) => setCodeSearch(e.target.value)}
         />
-        <style>
-            {`
-              .course-filter-input::placeholder {
-                color: white;
-                opacity: 1;
-              }
-            `}
-          </style>
 
         <select
-          className="course-filter-select"
-          value={deptFilter}
-          onChange={(e) => setDeptFilter(e.target.value)}
-        >
+            className="course-filter-select"
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+            style={{ backgroundColor: "rgb(156,148,148)" }}
+          >
+
           <option value="">Offering Department</option>
           <option value="CSE">CSE</option>
           <option value="ECE">ECE</option>
@@ -98,19 +92,12 @@ export default function CoursesOffered() {
           value={titleFilter}
           onChange={(e) => setTitleFilter(e.target.value)}
         />
-        <style>
-            {`
-              .course-filter-input::placeholder {
-                color: white;
-                opacity: 1;
-              }
-            `}
-          </style>
 
         <select
           className="course-filter-select"
           value={semesterFilter}
           onChange={(e) => setSemesterFilter(e.target.value)}
+          style={{ backgroundColor: "rgb(156,148,148)" }}
         >
           <option value="">Semester</option>
           <option value="2025-I">2025-I</option>
@@ -145,10 +132,25 @@ export default function CoursesOffered() {
               <div><b>Instructor:</b> {course.instructor_name}</div>
               <div><b>Department:</b> {course.department}</div>
               <div><b>L-P-T-S-C:</b> {course.ltpsc ?? "NA"}</div>
+
+              {/* 🔹 ELIGIBILITY */}
+              <div>
+                <b>Eligibility:</b>{" "}
+                {course.eligibility && course.eligibility.length > 0 ? (
+                  course.eligibility.map((e, idx) => (
+                    <span key={idx} className="eligibility-badge">
+                      {e.branch} ({e.entry_year})
+                    </span>
+                  ))
+                ) : (
+                  <span className="eligibility-none">Not specified</span>
+                )}
+              </div>
             </div>
           </div>
         ))}
       </div>
+
 
       {selectedCourse && (
         <CourseModal

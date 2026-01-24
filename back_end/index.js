@@ -374,42 +374,77 @@ app.get("/student/:id", async (req, res) => {
 });
 
 
-//Courses info
+// Courses info 
 app.get("/courses", async (req, res) => {
-  const { data, error } = await supabase
-    .from("teaches")
-    .select(`
-      semester,
-      courses (
+  try {
+    // 1️⃣ Fetch course offerings
+    const { data: teachesData, error: teachesError } = await supabase
+      .from("teaches")
+      .select(`
+        semester,
+        courses (
+          course_id,
+          title,
+          department,
+          credits,
+          "L-P-T-S-C"
+        ),
+        instructors (
+          name
+        )
+      `);
+
+    if (teachesError) {
+      console.error(teachesError);
+      return res.status(500).json({ error: "Failed to fetch courses" });
+    }
+
+    // 2️⃣ Fetch eligibility table
+    const { data: eligibilityData, error: eligibilityError } = await supabase
+      .from("course_eligibility")
+      .select(`
         course_id,
-        title,
-        department,
-        credits,
-        "L-P-T-S-C"
-      ),
-      instructors (
-        name
-      )
-    `);
+        semester,
+        branch,
+        entry_year
+      `);
 
-  if (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Failed to fetch courses" });
+    if (eligibilityError) {
+      console.error(eligibilityError);
+      return res.status(500).json({ error: "Failed to fetch course eligibility" });
+    }
+
+    // 3️⃣ Merge courses + eligibility
+    const formatted = teachesData.map(row => {
+      const courseId = row.courses.course_id;
+      const semester = row.semester;
+
+      return {
+        course_id: courseId,
+        title: row.courses.title,
+        department: row.courses.department,
+        credits: row.courses.credits,
+        semester,
+        ltpsc: row.courses["L-P-T-S-C"],
+        instructor_name: row.instructors.name,
+
+        // 🔹 attach eligibility for this course + semester
+        eligibility: eligibilityData.filter(
+          e =>
+            e.course_id === courseId &&
+            e.semester === semester
+        )
+      };
+    });
+
+    res.json(formatted);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
-
-  // Flatten response
-  const formatted = data.map(row => ({
-    course_id: row.courses.course_id,
-    title: row.courses.title,
-    department: row.courses.department,
-    credits: row.courses.credits,
-    semester: row.semester,
-    ltpsc: row.courses["L-P-T-S-C"],
-    instructor_name: row.instructors.name
-  }));
-
-  res.json(formatted);
 });
+
 
 
 
