@@ -1,5 +1,24 @@
-.course-details-container h2,p,h3{
-  color: black;
+.course-details-container h2,
+.course-details-container p,
+.course-details-container h3 {
+  color: #1f2937;
+}
+
+.course-details-container h2 {
+  font-weight: 700;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.course-details-container h3 {
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 24px;
+}
+
+.course-details-container p {
+  color: #6b7280;
+  line-height: 1.6;
 }
 
 .give-grade-btn {
@@ -13,24 +32,27 @@
   gap: 12px;
   margin-bottom: 15px;
   align-items: center;
-  background-color: black;
+  background-color: transparent;
+  padding: 0;
 }
 
-.top-actions button{
+.top-actions button {
   background: transparent;
-  border: 1px solid #fff;
-  color: white;
-  padding: 12px 26px;
+  border: 2px solid #6b7280;
+  color: #6b7280;
+  padding: 10px 16px;
   border-radius: 6px;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
-  margin-top: 10px;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
 }
 
-.top-actions button:hover{
-  background: white;
-  color: black;
+.top-actions button:hover {
+  border-color: #9ca3af;
+  color: #1f2937;
+  background: rgba(107, 114, 128, 0.05);
 }
 
 /* Table styles */
@@ -48,11 +70,16 @@
 }
 
 .requests-table th {
-  background-color: black;
-  color: white;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
 }
-.requests-table tr{
-  color: black;
+.requests-table tr {
+  color: #6b7280;
+}
+.requests-table tr:hover {
+  background-color: #f9fafb;
 }
 
 .action-cell {
@@ -61,16 +88,39 @@
 }
 
 .approve-btn {
-  padding: 6px 12px;
+  padding: 8px 14px;
   cursor: pointer;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+}
+
+.approve-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
 }
 
 .reject-btn {
-  padding: 6px 12px;
+  padding: 8px 14px;
   cursor: pointer;
-  background-color: #ff4d4d;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
   border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+}
+
+.reject-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
 }
 
 /* Mobile responsive */

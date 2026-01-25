@@ -1,94 +1,103 @@
 /* ================= FACULTY ADVISOR SCOPE ================= */
 .fa-scope {
-  background-color: white;
-  color: black;
+  background-color: #f9fafb;
+  color: #1f2937;
   min-height: 100vh;
   box-sizing: border-box;
   font-family: "Segoe UI", Tahoma, sans-serif;
-  
 }
 
-.fa-nav-bar{
-  background-color: black;
+.fa-nav-bar {
+  background-color: #1f2937;
   display: flex;
-  height: 3.8rem;
   align-items: center;
   justify-content: space-between;
-}
-.fa-nav-bar {
-  background-color: black;
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* 🔥 */
-  padding: 0 16px;
-  height: 3.8rem;
+  padding: 16px 28px;
+  height: 72px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .fa-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .fa-right {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
-
 
 .fa-nav-bar h2 {
   margin: 0;
-  color: white !important;
-  font-size: 1.5rem !important;
-  padding-top: 10px;
-}
-.fa-nav-bar-left{
+  color: white;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   display: flex;
-  gap: 1rem;
+  align-items: center;
+}
+
+.fa-nav-bar-left {
+  display: flex;
+  gap: 12px;
 }
 
 /* ================= HEADINGS ================= */
 .fa-scope h2 {
-  margin-top: 10px;
+  margin-top: 0;
   margin-bottom: 24px;
   font-size: 28px;
-  font-weight: 600;
-  color: black;
+  font-weight: 700;
+  color: #1f2937;
+  letter-spacing: -0.5px;
 }
-
 
 /* ================= TOP ACTION BUTTONS ================= */
 .view-btn {
   background: transparent;
-  border: 1px solid #fff;
-  color: white;
-  padding: 12px 26px;
+  border: 2px solid #6b7280;
+  color: #6b7280;
+  padding: 10px 16px;
   border-radius: 6px;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
 }
-
-
 
 /* Hover */
 .view-btn:hover {
-  background: white;
-  color: black;
+  border-color: #9ca3af;
+  color: #1f2937;
+  background: rgba(107, 114, 128, 0.05);
 }
 
 /* ================= LOGOUT ================= */
 .fa-scope .logout-btn {
-  background-color: transparent;
-  border: 1px solid #ff5a5a;
-  color: #ff5a5a;
-  padding: 10px 20px;
-  margin-left: 20px;
+  background: #ef4444;
+  border: 2px solid #ef4444;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .fa-scope .logout-btn:hover {
-  background-color: #ff5a5a;
-  color: #000;
+  background: #dc2626;
+  border-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* ================= BULK ACTIONS ================= */
@@ -96,62 +105,115 @@
   display: flex;
   gap: 12px;
   margin: 20px 0;
+  flex-wrap: wrap;
 }
 
 .fa-scope .approve-btn {
-  background-color: #2e7d32;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   padding: 10px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
 }
 
 .fa-scope .approve-btn:hover {
-  background-color: #388e3c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
 }
 
 .fa-scope .reject-btn {
-  background-color: #c62828;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
   padding: 10px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
 }
 
 .fa-scope .reject-btn:hover {
-  background-color: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
 }
 
 /* ================= TABLE WRAPPER ================= */
 .fa-scope .table-wrapper {
   overflow-x: auto;
   margin-top: 20px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
 }
 
 /* ================= TABLE ================= */
 .fa-scope table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #ffffff;
-  color: #222;
-  border-radius: 8px;
+  background-color: white;
+  color: #1f2937;
+  border-radius: 12px;
   overflow: hidden;
 }
 
 .fa-scope thead {
-  background-color: #f1f1f1;
+  background-color: #f3f4f6;
 }
 
 .fa-scope th,
 .fa-scope td {
   padding: 14px 16px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.fa-scope th {
-  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
   font-size: 14px;
 }
 
+.fa-scope th {
+  font-weight: 700;
+  color: #1f2937;
+  background: #f3f4f6;
+}
+
+.fa-scope tbody tr {
+  transition: background-color 0.2s ease;
+}
+
 .fa-scope tbody tr:hover {
-  background-color: #f6f6f6;
+  background-color: #f9fafb;
+}
+
+/* ================= ACTION BUTTONS IN TABLE ================= */
+.fa-scope td button {
+  padding: 6px 12px;
+  margin-right: 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* ================= STATUS COLORS ================= */
+.fa-scope .status-approved {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.fa-scope .status-rejected {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.fa-scope .status-pending {
+  color: #f59e0b;
+  font-weight: 600;
 }
 
 /* ================= ACTION BUTTONS IN TABLE ================= */
@@ -173,11 +235,6 @@
   font-weight: 600;
 }
 
-/* ================= EMPTY STATES ================= */
-.fa-scope p {
-  color: #999;
-}
-
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   .fa-scope {
@@ -185,17 +242,22 @@
   }
 
   .fa-scope h2 {
-    font-size: 22px;
+    font-size: 24px;
   }
 
-  /* Buttons wrap nicely on mobile */
   .fa-scope .view-btn,
   .fa-scope .logout-btn {
     margin-bottom: 10px;
+    padding: 9px 14px;
+    font-size: 13px;
   }
 
   .fa-scope .bulk-actions {
     flex-direction: column;
+  }
+
+  .fa-scope .bulk-actions button {
+    width: 100%;
   }
 
   .fa-scope th,
@@ -208,7 +270,8 @@
 /* ===== MOBILE NAV ===== */
 .desktop-only {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  align-items: center;
 }
 
 .mobile-only {
@@ -218,37 +281,50 @@
 .hamburger {
   font-size: 22px;
   cursor: pointer;
-  padding: 6px 10px;
+  padding: 8px;
+  color: #e5e7eb;
+  transition: color 0.2s ease;
+}
+
+.hamburger:hover {
+  color: white;
 }
 
 .mobile-menu {
-  position: fixed;          /* 🔥 KEY FIX */
-  top: 3.8rem;              /* just below navbar */
+  position: fixed;
+  top: 72px;
   right: 16px;
-
   background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  min-width: 160px;
-  outline: 2px solid red;
-  z-index: 9999;            /* 🔥 ensure on top */
+  min-width: 180px;
+  z-index: 9999;
+  border: 1px solid #e5e7eb;
 }
 
 .mobile-menu button {
-  color: black;          /* 🔥 FIX: visible text */
+  color: #1f2937;
   background: none;
   border: none;
   text-align: left;
-  padding: 10px;
+  padding: 12px 16px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
+.mobile-menu button:hover {
+  background: #f3f4f6;
+  color: #4f46e5;
+}
 
 .mobile-menu hr {
-  margin: 6px 0;
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -258,7 +334,18 @@
   }
 
   .mobile-only {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fa-nav-bar {
+    padding: 12px 16px;
+    height: 60px;
+  }
+
+  .mobile-menu {
+    top: 60px;
   }
 }
 
