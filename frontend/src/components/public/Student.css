@@ -598,6 +598,8 @@
   flex-wrap: wrap;
   align-items: center;
   margin-bottom: 20px;
+  
+  
 }
 
 /* Inputs & selects inside filter bar */
@@ -609,7 +611,10 @@
   border: 1px solid #e5e7eb;
   outline: none;
   min-width: 180px;
-  background: white;
+  background-color: rgb(156, 148, 148);
+  color: #1f2937;
+}
+.course-filter-bar input::placeholder{
   color: #1f2937;
 }
 

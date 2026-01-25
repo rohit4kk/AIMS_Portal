@@ -11,12 +11,9 @@ export default function InstructorCourseDetails() {
 
   const [requests, setRequests] = useState([]);
   const [showGrade, setShowGrade] = useState(false);
-
   const [bulkMode, setBulkMode] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState({});
-
-  // 🔽 NEW: mobile collapse state for action buttons
-  const [actionsOpen, setActionsOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   /* ------------------- DATA FETCH ------------------- */
 
@@ -80,7 +77,7 @@ export default function InstructorCourseDetails() {
 
     setBulkMode(false);
     setSelectedStudents({});
-    setActionsOpen(false);
+    setMobileMenuOpen(false);
     fetchRequests();
   };
 
@@ -124,59 +121,61 @@ export default function InstructorCourseDetails() {
     fetchRequests();
   };
 
+  const handleNavigation = (path, state = null) => {
+    if (state) {
+      navigate(path, { state });
+    } else {
+      navigate(path);
+    }
+    setMobileMenuOpen(false);
+  };
+
   /* ------------------- UI ------------------- */
 
   return (
     <div className="course-details-container">
-      {/* ===== ACTION BUTTONS (COLLAPSIBLE) ===== */}
-      <div className="top-actions-wrapper">
-        {/* MOBILE TOGGLE */}
-        <div
-          className="actions-hamburger mobile-only"
-          onClick={() => setActionsOpen(!actionsOpen)}
-        >
-          ☰ Actions
+      {/* ===== NAVIGATION BAR ===== */}
+      <nav className="cd-nav-bar">
+        <div className="nav-left">
+          <h2>AIMS</h2>
+          <button 
+            className="hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            ☰
+          </button>
         </div>
 
-        {/* ACTION BUTTONS */}
-        <div className={`top-actions ${actionsOpen ? "open" : ""}`}>
-          <button
-            className="give-grade-btn"
-            onClick={() => {
-              navigate("/instructor");
-              setActionsOpen(false);
-            }}
+        <div className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}>
+          <button 
+            className="nav-view-btn"
+            onClick={() => handleNavigation("/instructor")}
           >
             Home
           </button>
 
-          <button
-            className="give-grade-btn"
-            onClick={() => {
-              navigate(`/instructor/course/${courseId}/edit`, {
-                state: course
-              });
-              setActionsOpen(false);
-            }}
+          <button 
+            className="nav-view-btn"
+            onClick={() => handleNavigation(`/instructor/course/${courseId}/edit`, course)}
           >
             Edit Course
           </button>
 
-          <button
-            className="give-grade-btn"
+          <button 
+            className="nav-view-btn"
             onClick={() => {
               setShowGrade(true);
-              setActionsOpen(false);
+              setMobileMenuOpen(false);
             }}
           >
             Give Grade
           </button>
 
-          <button
-            className="give-grade-btn"
+          <button 
+            className="nav-view-btn"
             onClick={() => {
               handleApproveAllClick();
-              setActionsOpen(false);
+              setMobileMenuOpen(false);
             }}
             disabled={requests.length === 0}
           >
@@ -185,22 +184,26 @@ export default function InstructorCourseDetails() {
 
           {bulkMode && (
             <button
-              className="give-grade-btn"
+              className="nav-view-btn submit-bulk"
               onClick={submitBulkApprove}
             >
               Submit Approval
             </button>
           )}
         </div>
-      </div>
+      </nav>
 
       {/* ===== COURSE INFO ===== */}
-      <h2>
-        {course.course_id} – {course.title}
-      </h2>
+      <div className="course-info-section">
+        <h2>
+          {course.course_id} – {course.title}
+        </h2>
 
-      <p><strong>Credits:</strong> {course.credits}</p>
-      <p><strong>Semester:</strong> {course.semester}</p>
+        <div className="course-meta">
+          <p><strong>Credits:</strong> {course.credits}</p>
+          <p><strong>Semester:</strong> {course.semester}</p>
+        </div>
+      </div>
 
       {showGrade && (
         <GiveGrade
@@ -209,70 +212,72 @@ export default function InstructorCourseDetails() {
         />
       )}
 
-      <hr />
+      <hr className="course-divider" />
 
       {/* ===== REQUESTS TABLE ===== */}
-      <h3>Pending Enrollment Requests</h3>
+      <div className="requests-section">
+        <h3>Pending Enrollment Requests</h3>
 
-      {requests.length === 0 && <p>No pending requests</p>}
+        {requests.length === 0 && <p className="no-data">No pending requests</p>}
 
-      {requests.length > 0 && (
-        <div className="requests-table-wrapper">
-          <table className="requests-table">
-            <thead>
-              <tr>
-                {bulkMode && <th>Select</th>}
-                <th>Student Name</th>
-                <th>Roll Number</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>Year</th>
-                {!bulkMode && <th>Action</th>}
-              </tr>
-            </thead>
-
-            <tbody>
-              {requests.map(req => (
-                <tr key={req.student_id}>
-                  {bulkMode && (
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={!!selectedStudents[req.student_id]}
-                        onChange={() => toggleStudent(req.student_id)}
-                      />
-                    </td>
-                  )}
-
-                  <td>{req.name}</td>
-                  <td>{req.roll_no}</td>
-                  <td>{req.email}</td>
-                  <td>{req.department}</td>
-                  <td>{req.email.substring(0, 4)}</td>
-
-                  {!bulkMode && (
-                    <td className="action-cell">
-                      <button
-                        className="approve-btn"
-                        onClick={() => handleApprove(req.student_id)}
-                      >
-                        Approve
-                      </button>
-
-                      <button
-                        className="reject-btn"
-                        onClick={() => handleReject(req.student_id)}
-                      >
-                        Reject
-                      </button>
-                    </td>
-                  )}
+        {requests.length > 0 && (
+          <div className="requests-table-wrapper">
+            <table className="requests-table">
+              <thead>
+                <tr>
+                  {bulkMode && <th>Select</th>}
+                  <th>Student Name</th>
+                  <th>Roll Number</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th>Year</th>
+                  {!bulkMode && <th>Action</th>}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+
+              <tbody>
+                {requests.map(req => (
+                  <tr key={req.student_id}>
+                    {bulkMode && (
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={!!selectedStudents[req.student_id]}
+                          onChange={() => toggleStudent(req.student_id)}
+                        />
+                      </td>
+                    )}
+
+                    <td>{req.name}</td>
+                    <td>{req.roll_no}</td>
+                    <td>{req.email}</td>
+                    <td>{req.department}</td>
+                    <td>{req.email.substring(0, 4)}</td>
+
+                    {!bulkMode && (
+                      <td className="action-cell">
+                        <button
+                          className="approve-btn"
+                          onClick={() => handleApprove(req.student_id)}
+                        >
+                          Approve
+                        </button>
+
+                        <button
+                          className="reject-btn"
+                          onClick={() => handleReject(req.student_id)}
+                        >
+                          Reject
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

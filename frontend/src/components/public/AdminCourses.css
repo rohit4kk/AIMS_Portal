@@ -26,7 +26,7 @@
   margin: 0;
   font-size: 13px;
   color: white;
-  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 600;
@@ -79,7 +79,7 @@
 }
 
 .admin-table th {
-  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
   font-weight: 700;
   color: white;
   font-size: 14px;

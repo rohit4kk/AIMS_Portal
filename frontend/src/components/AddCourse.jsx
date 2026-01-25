@@ -18,10 +18,12 @@ export default function AddCourse() {
         </div>
       </nav>
 
-      <Course_Form
-        onClose={() => navigate("/instructor")}
-        onCourseAdded={() => navigate("/instructor")}
-      />
+      <div className="course-form-wrapper">
+        <Course_Form
+          onClose={() => navigate("/instructor")}
+          onCourseAdded={() => navigate("/instructor")}
+        />
+      </div>
     </div>
   );
 }

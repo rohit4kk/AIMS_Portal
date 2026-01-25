@@ -90,15 +90,24 @@ export default function FacultyAdvisor() {
   /* ================= BULK START ================= */
 
   const startBulk = (decision) => {
-    const init = {};
-    requests.forEach(r => {
-      init[`${r.student_id}-${r.course_id}`] = true;
-    });
+  // If already in bulk mode with SAME decision → close it
+  if (bulkMode && bulkDecision === decision) {
+    setBulkMode(false);
+    setBulkDecision(null);
+    setSelected({});
+    return;
+  }
 
-    setSelected(init);
-    setBulkDecision(decision);
-    setBulkMode(true);
-  };
+  // Otherwise open bulk mode
+  const init = {};
+  requests.forEach(r => {
+    init[`${r.student_id}-${r.course_id}`] = true;
+  });
+
+  setSelected(init);
+  setBulkDecision(decision);
+  setBulkMode(true);
+};
 
   /* ================= BULK SUBMIT ================= */
 
@@ -164,7 +173,7 @@ export default function FacultyAdvisor() {
             className="hamburger mobile-only"
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            ⋮
+            ☰
           </div>
         </div>
 
@@ -285,6 +294,7 @@ export default function FacultyAdvisor() {
         {/* ===== STUDENTS ===== */}
         {view === "STUDENTS" && (
           <>
+            <div className="students-scroll-container">
             {!selectedStudent && (
               <table style={table}>
                 <thead>
@@ -357,6 +367,7 @@ export default function FacultyAdvisor() {
                   ))}
               </>
             )}
+            </div>
           </>
         )}
 

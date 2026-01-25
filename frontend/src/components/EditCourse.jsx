@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import "./public/Course_Form.css";
+import "./public/EditCourse.css"
 
 export default function EditCourse() {
   const { courseId } = useParams();
@@ -99,6 +99,7 @@ export default function EditCourse() {
   };
 
   return (
+  <div className="edit-course-page">
     <div className="course-form">
       <h3>Edit Course Offering</h3>
 
@@ -107,21 +108,23 @@ export default function EditCourse() {
         value={`${course.course_id} - ${course.title}`}
         disabled
         className="course-input"
-        style={{backgroundColor:"black",color:"white",marginBottom:"10px"}}
+        style={{ color: "white", marginBottom: "10px" }}
       />
 
-      {/* SEMESTER (read-only for now) */}
-      <input value={semester} disabled className="course-input" style={{backgroundColor:"black",color:"white"}} />
+      {/* SEMESTER */}
+      <input
+        value={semester}
+        disabled
+        className="course-input"
+        style={{color: "white" }}
+      />
 
       {/* ELIGIBILITY */}
       <div className="eligibility-section">
         <h4>Course Eligibility</h4>
 
         <div className="eligibility-inputs">
-          <select
-            value={branch}
-            onChange={(e) => setBranch(e.target.value)}
-          >
+          <select value={branch} onChange={(e) => setBranch(e.target.value)}>
             <option value="">Branch</option>
             <option value="CSE">CSE</option>
             <option value="ECE">ECE</option>
@@ -132,19 +135,10 @@ export default function EditCourse() {
           <input
             className="custom-input"
             type="number"
-            placeholder="Year(eg. 2023)"
+            placeholder="Year (eg. 2023)"
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            min="1"
           />
-          <style>
-            {`
-              .custom-input::placeholder {
-                color: white;
-                opacity: 1;
-              }
-            `}
-          </style>
 
           <button onClick={addEligibility}>✓</button>
         </div>
@@ -164,9 +158,7 @@ export default function EditCourse() {
                   <td>{e.branch}</td>
                   <td>{e.entry_year}</td>
                   <td>
-                    <button onClick={() => removeEligibility(index)}>
-                      ❌
-                    </button>
+                    <button onClick={() => removeEligibility(index)}>❌</button>
                   </td>
                 </tr>
               ))}
@@ -180,5 +172,7 @@ export default function EditCourse() {
         <button onClick={() => navigate(-1)}>Cancel</button>
       </div>
     </div>
+  </div>
   );
+
 }

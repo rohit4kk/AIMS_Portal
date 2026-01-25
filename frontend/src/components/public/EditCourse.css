@@ -1,0 +1,17 @@
+.edit-course-page {
+  display: flex;
+  justify-content: center;    /* horizontal center */
+  align-items: center;        /* vertical center */
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Optional but recommended */
+.course-form {
+  width: 100%;
+  max-width: 600px;
+}
+
+.course-form .course-input{
+    background-color: #1f2937;
+}

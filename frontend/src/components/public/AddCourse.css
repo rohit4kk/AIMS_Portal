@@ -4,3 +4,11 @@
 .navbar-right button{
   background-color: grey;
 }
+
+.course-form-wrapper {
+  display: flex;
+  justify-content: center;    /* horizontal center */
+  align-items: center;        /* vertical center */
+  min-height: 100vh;
+  padding: 20px;
+}

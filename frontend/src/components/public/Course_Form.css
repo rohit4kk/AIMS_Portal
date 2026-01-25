@@ -30,8 +30,13 @@
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   font-size: 14px;
-  color: #1f2937;
+  color: white;
   transition: all 0.2s ease;
+  background-color: #1f2937;
+}
+
+.course-input::placeholder{
+  color: white;
 }
 
 .course-input:focus {
@@ -79,11 +84,12 @@
   margin-top: 12px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
-  background: white;
-  color: #1f2937;
+  
+  color: white;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
+  background-color: #1f2937;
 }
 
 .semester-select:focus {
@@ -118,6 +124,10 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
+}
+
+.course-form-actions button{
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 }
 
 .course-form-actions button.submit {
@@ -158,13 +168,20 @@
 
 .eligibility-inputs select{
   border-radius: 11px;
+  background-color: #1f2937;
+  color: white;
 }
 .eligibility-inputs input{
   border-radius: 11px;
+  background-color: #1f2937;
+  color: white;
+}
+.eligibility-inputs input::placeholder{
+  color: white;
 }
 .eligibility-inputs button{
   border-radius: 11px;
-
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 }
 
 /* TABLE CONTAINER */
@@ -181,7 +198,8 @@
 
 /* HEADER */
 .eligibility-table thead {
-  background-color: black;
+    background-color: #f3f4f6;
+    color: black;
 }
 
 .eligibility-table th {
@@ -198,6 +216,8 @@
   text-align: center;
   font-size: 14px;
   border-bottom: 1px solid #334155;
+  background-color: white;
+  color: black;
 }
 
 
