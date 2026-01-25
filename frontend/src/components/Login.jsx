@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./public/Login.css";
 
 export default function Login() {
@@ -12,16 +12,17 @@ export default function Login() {
 
   const [resendTimer, setResendTimer] = useState(0);
 
+  /* ================= AUTO REDIRECT ================= */
   useEffect(() => {
-  const role = localStorage.getItem("role");
+    const role = localStorage.getItem("role");
 
-  if (role === "STUDENT") window.location.href = "/student";
-  if (role === "INSTRUCTOR") window.location.href = "/instructor";
-  if (role === "FACULTY_ADVISOR") window.location.href = "/fa";
-  if(role === "ADMIN") window.location.href = "/admin";
-}, []);
+    if (role === "STUDENT") window.location.href = "/student";
+    if (role === "INSTRUCTOR") window.location.href = "/instructor";
+    if (role === "FACULTY_ADVISOR") window.location.href = "/fa";
+    if (role === "ADMIN") window.location.href = "/admin";
+  }, []);
 
-
+  /* ================= RESEND TIMER ================= */
   const startResendTimer = (seconds = 30) => {
     setResendTimer(seconds);
     const interval = setInterval(() => {
@@ -35,6 +36,7 @@ export default function Login() {
     }, 1000);
   };
 
+  /* ================= GENERATE OTP ================= */
   const generateOtp = async () => {
     if (!email) {
       setMessage("Please enter email first");
@@ -47,9 +49,7 @@ export default function Login() {
     try {
       const res = await fetch("http://localhost:5001/generate-otp", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
 
@@ -63,13 +63,14 @@ export default function Login() {
       setMessage("OTP sent to your email");
       setStep(2);
       startResendTimer(30);
-    } catch (err) {
+    } catch {
       setMessage("Server not reachable");
     } finally {
       setLoadingOtp(false);
     }
   };
 
+  /* ================= VERIFY OTP ================= */
   const verifyOtp = async () => {
     if (!otp) {
       setMessage("Please enter OTP");
@@ -82,9 +83,7 @@ export default function Login() {
     try {
       const res = await fetch("http://localhost:5001/verify-otp", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp })
       });
 
@@ -95,7 +94,6 @@ export default function Login() {
         return;
       }
 
-      // ✅ STORE USER DATA
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("role", data.role);
 
@@ -103,16 +101,23 @@ export default function Login() {
       if (data.role === "INSTRUCTOR") window.location.href = "/instructor";
       if (data.role === "FACULTY_ADVISOR") window.location.href = "/fa";
       if (data.role === "ADMIN") window.location.href = "/admin";
-    } catch (err) {
+    } catch {
       setMessage("Server not reachable");
     } finally {
       setLoadingLogin(false);
     }
   };
 
+  /* ================= SUBMIT HANDLER ================= */
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (step === 1 && !loadingOtp) generateOtp();
+    if (step === 2 && !loadingLogin) verifyOtp();
+  };
+
   return (
     <div className="login-wrapper">
-      <div className="login-card">
+      <form className="login-card" onSubmit={handleSubmit}>
         <h2>AIMS Login</h2>
 
         {step === 1 && (
@@ -124,10 +129,11 @@ export default function Login() {
               onChange={e => setEmail(e.target.value)}
               className="login-input"
               disabled={loadingOtp}
+              autoFocus
             />
 
             <button
-              onClick={generateOtp}
+              type="submit"
               className="login-btn"
               disabled={loadingOtp}
             >
@@ -145,10 +151,11 @@ export default function Login() {
               onChange={e => setOtp(e.target.value)}
               className="login-input"
               disabled={loadingLogin}
+              autoFocus
             />
 
             <button
-              onClick={verifyOtp}
+              type="submit"
               className="login-btn"
               disabled={loadingLogin}
             >
@@ -156,6 +163,7 @@ export default function Login() {
             </button>
 
             <button
+              type="button"
               onClick={generateOtp}
               className="login-btn resend-btn"
               disabled={resendTimer > 0 || loadingOtp}
@@ -171,7 +179,7 @@ export default function Login() {
         )}
 
         {message && <p className="login-message">{message}</p>}
-      </div>
+      </form>
     </div>
   );
 }
