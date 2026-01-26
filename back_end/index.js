@@ -446,6 +446,126 @@ app.get("/courses", async (req, res) => {
 });
 
 
+app.post("/admin/import-students", async (req, res) => {
+  try {
+    const { students } = req.body;
+
+    if (!Array.isArray(students)) {
+      return res.status(400).json({ error: "Students array required" });
+    }
+
+    const success = [];
+    const errors = [];
+
+    for (let i = 0; i < students.length; i++) {
+      const s = students[i];
+      let userId = null;
+
+      try {
+        // 1️⃣ Validate required fields
+        if (
+          !s.name ||
+          !s.email ||
+          !s.department ||
+          !s.year ||
+          !s.roll_no ||
+          !s.fa_email
+        ) {
+          throw new Error("Missing required fields");
+        }
+
+        // CHECK IF USER ALREADY EXISTS
+const { data: existingUser } = await supabase
+  .from("users")
+  .select("id")
+  .eq("email", s.email)
+  .maybeSingle();
+
+let userId;
+
+if (existingUser) {
+  userId = existingUser.id;
+} else {
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .insert({ email: s.email, role: "STUDENT" })
+    .select("id")
+    .single();
+
+  if (userError || !userData) {
+    throw new Error("Failed to create user");
+  }
+
+  userId = userData.id;
+}
+
+
+        // 3️⃣ Resolve FA email → fa_id
+        const { data: fa, error: faError } = await supabase
+          .from("faculty_advisors")
+          .select("id")
+          .eq("email", s.fa_email)
+          .maybeSingle();
+
+        if (faError || !fa) {
+          throw new Error("Faculty Advisor not found");
+        }
+
+        // 4️⃣ Insert student using SAME ID as user
+        const { error: studentError } = await supabase
+          .from("students")
+          .insert({
+            id: userId,
+            name: s.name,
+            email: s.email,
+            department: s.department,
+            year: s.year,
+            roll_no: s.roll_no,
+            fa_id: fa.id
+          });
+
+        if (studentError) {
+          throw new Error("Failed to create student");
+        }
+
+        // 5️⃣ Track success
+        success.push({
+          email: s.email,
+          roll_no: s.roll_no
+        });
+
+      } catch (err) {
+        // 🧹 Cleanup user if student insert failed
+        if (userId) {
+          await supabase.from("users").delete().eq("id", userId);
+        }
+
+        errors.push({
+          row: i + 1,
+          email: s.email || null,
+          roll_no: s.roll_no || null,
+          reason: err.message
+        });
+      }
+    }
+
+    // 6️⃣ Final response
+    res.status(200).json({
+      success,
+      errors,
+      summary: {
+        total: students.length,
+        inserted: success.length,
+        failed: errors.length
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 
 // Enrollment requests for a course
