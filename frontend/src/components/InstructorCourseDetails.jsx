@@ -10,12 +10,13 @@ export default function InstructorCourseDetails() {
   const navigate = useNavigate();
 
   const [requests, setRequests] = useState([]);
+  const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [showGrade, setShowGrade] = useState(false);
   const [bulkMode, setBulkMode] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  /* ------------------- DATA FETCH ------------------- */
+  /* =================== FETCH DATA =================== */
 
   const fetchRequests = async () => {
     const res = await fetch(
@@ -27,11 +28,22 @@ export default function InstructorCourseDetails() {
     else console.error(data.error);
   };
 
+  const fetchEnrolledStudents = async () => {
+    const res = await fetch(
+      `http://localhost:5001/instructor/course/${courseId}/enrolled`
+    );
+    const data = await res.json();
+
+    if (res.ok) setEnrolledStudents(data);
+    else console.error(data.error);
+  };
+
   useEffect(() => {
     fetchRequests();
+    fetchEnrolledStudents();
   }, [courseId]);
 
-  /* ------------------- BULK APPROVE ------------------- */
+  /* ================= BULK APPROVE ================= */
 
   const handleApproveAllClick = () => {
     const initialSelection = {};
@@ -78,10 +90,12 @@ export default function InstructorCourseDetails() {
     setBulkMode(false);
     setSelectedStudents({});
     setMobileMenuOpen(false);
+
     fetchRequests();
+    fetchEnrolledStudents(); // 🔁 refresh count
   };
 
-  /* ------------------- SINGLE ACTIONS ------------------- */
+  /* ================= SINGLE ACTIONS ================= */
 
   const handleApprove = async (studentId) => {
     const res = await fetch(
@@ -100,6 +114,7 @@ export default function InstructorCourseDetails() {
     }
 
     fetchRequests();
+    fetchEnrolledStudents();
   };
 
   const handleReject = async (studentId) => {
@@ -122,23 +137,19 @@ export default function InstructorCourseDetails() {
   };
 
   const handleNavigation = (path, state = null) => {
-    if (state) {
-      navigate(path, { state });
-    } else {
-      navigate(path);
-    }
+    navigate(path, state ? { state } : undefined);
     setMobileMenuOpen(false);
   };
 
-  /* ------------------- UI ------------------- */
+  /* ======================== UI ======================== */
 
   return (
     <div className="course-details-container">
-      {/* ===== NAVIGATION BAR ===== */}
+      {/* ===== NAV BAR ===== */}
       <nav className="cd-nav-bar">
         <div className="nav-left">
           <h2>AIMS</h2>
-          <button 
+          <button
             className="hamburger-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
@@ -147,21 +158,20 @@ export default function InstructorCourseDetails() {
         </div>
 
         <div className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}>
-          <button 
-            className="nav-view-btn"
-            onClick={() => handleNavigation("/instructor")}
-          >
+          <button className="nav-view-btn" onClick={() => handleNavigation("/instructor")}>
             Home
           </button>
 
-          <button 
+          <button
             className="nav-view-btn"
-            onClick={() => handleNavigation(`/instructor/course/${courseId}/edit`, course)}
+            onClick={() =>
+              handleNavigation(`/instructor/course/${courseId}/edit`, course)
+            }
           >
             Edit Course
           </button>
 
-          <button 
+          <button
             className="nav-view-btn"
             onClick={() => {
               setShowGrade(true);
@@ -171,12 +181,9 @@ export default function InstructorCourseDetails() {
             Give Grade
           </button>
 
-          <button 
+          <button
             className="nav-view-btn"
-            onClick={() => {
-              handleApproveAllClick();
-              setMobileMenuOpen(false);
-            }}
+            onClick={handleApproveAllClick}
             disabled={requests.length === 0}
           >
             Approve All
@@ -202,14 +209,12 @@ export default function InstructorCourseDetails() {
         <div className="course-meta">
           <p><strong>Credits:</strong> {course.credits}</p>
           <p><strong>Semester:</strong> {course.semester}</p>
+          <p><strong>Enrolled Students:</strong> {enrolledStudents.length}</p>
         </div>
       </div>
 
       {showGrade && (
-        <GiveGrade
-          courseId={courseId}
-          onClose={() => setShowGrade(false)}
-        />
+        <GiveGrade courseId={courseId} onClose={() => setShowGrade(false)} />
       )}
 
       <hr className="course-divider" />
@@ -218,7 +223,9 @@ export default function InstructorCourseDetails() {
       <div className="requests-section">
         <h3>Pending Enrollment Requests</h3>
 
-        {requests.length === 0 && <p className="no-data">No pending requests</p>}
+        {requests.length === 0 && (
+          <p className="no-data">No pending requests</p>
+        )}
 
         {requests.length > 0 && (
           <div className="requests-table-wrapper">
