@@ -55,6 +55,7 @@ AIMS follows a multi-level course enrollment workflow, where a student’s enrol
 Authentication is implemented using a secure OTP-based email login system, eliminating the need for passwords and improving usability and security.
 
 ✨ Features
+
 🔐 Authentication
 
 OTP-based email login (no passwords)
