@@ -43,172 +43,81 @@ Follow the steps below to run the project locally.
 
 The application should now be running successfully
 
+ Overview:
 
-📌 Project Overview
+AIMS (Academic Information Management System) is a role-based web application designed to manage academic processes in a college environment. It digitizes workflows such as course offering, student enrollment, approval management, grading, and academic record tracking.
 
-AIMS (Academic Information Management System) is a role-based web portal designed to manage academic workflows in a college environment.
-The system digitizes and automates course enrollment, approvals, grading, and academic records, replacing manual and paper-based processes.
+The system supports four user roles — Student, Instructor, Faculty Advisor, and Admin — each having a dedicated dashboard with role-specific functionalities. A key feature of AIMS is its multi-level course enrollment process, where a student’s enrollment request must be approved by the course instructor and then by the faculty advisor before final enrollment.
 
-The application supports multiple user roles:
+Authentication is implemented using a secure OTP-based email login system, eliminating the need for passwords. The application follows a clean frontend–backend separation and uses a relational database with proper constraints to ensure data consistency and integrity.
 
-Student
+✨ Features:
+ Authentication
 
-Instructor
+OTP-based email login (no passwords)
 
-Faculty Advisor
+Secure session handling
 
-Admin
+Role-based redirection after login
 
-Each role has a separate dashboard with controlled access to features relevant to their responsibilities.
+ Student
 
- Core Objective
-
-The main objective of this project is to implement a multi-step course enrollment workflow where:
-
-A student requests enrollment in a course
-
-The instructor approves or rejects the request
-
-The faculty advisor gives final approval
-
-Only after both approvals, the student is officially enrolled
-
-This mirrors real academic processes used in universities.
-
- Authentication System
-
-OTP-based login (no passwords)
-
-User enters institutional email
-
-A 6-digit OTP is generated and emailed
-
-OTP is stored temporarily in the database with expiry
-
-On successful verification:
-
-User is logged in
-
-Redirected based on role (Student / Instructor / FA / Admin)
-
-This ensures secure and simple authentication.
-
- Student Features
-
-View personal dashboard
-
-Browse courses offered
+View available courses
 
 Search courses by course code
 
-Request enrollment in a course
+Request course enrollment
 
-Track enrollment status:
+Track enrollment status
 
-Pending Instructor Approval
+Drop courses (based on eligibility rules)
 
-Pending Advisor Approval
+View academic record grouped by semester
 
-Enrolled / Rejected
-
-Drop a course (only if allowed by rules)
-
-View academic record, grouped semester-wise:
-
-Courses taken
-
-Credits
-
-Grades
-
-Status
-
- Instructor Features
+ Instructor
 
 View instructor dashboard
 
-Add new courses offered
+Add and manage courses
 
-View courses they teach
+View enrollment requests
 
-See pending enrollment requests
+Approve or reject student enrollments
 
-Approve or reject student enrollment requests
+View enrolled students
 
-View list of enrolled students
+Assign and update grades
 
-Assign and update grades for enrolled students
+ Faculty Advisor
 
- Faculty Advisor Features
+View assigned students
 
-View students assigned to them
+Review enrollment requests
 
-See enrollment requests pending advisor approval
+Approve or reject enrollments
 
-Approve or reject enrollment after instructor approval
+View approval history
 
-View decision history for academic transparency
+ Admin
 
- Admin Features
+Dedicated admin dashboard
 
-Dedicated Admin Dashboard
+Add students, instructors, and faculty advisors
 
-Create new users without manual database entry:
+Automatic user creation with UUID-based IDs
 
-Students
+No manual database entry required
 
-Instructors
-
-Faculty Advisors
-
-Automatically inserts data into:
-
-users table (authentication)
-
-Corresponding role table (student / instructor / FA)
-
-Admin does not manually enter IDs
-
-System uses auto-generated UUIDs for consistency and safety
-
- Database Design (High Level)
-
-The database is designed using relational modeling with foreign keys and constraints to ensure data integrity.
-
-Main tables include:
-
-users – authentication and role mapping
-
-students
-
-instructors
-
-faculty_advisors
-
-courses
-
-teaches – instructor–course mapping
-
-takes – enrollment, approval status, grades
-
-All relationships enforce:
-
-Referential integrity
-
-Valid enrollment states
-
-Controlled grade assignment
-
-Tech Stack
+ Tech Stack :-
 Frontend
 
 React
 
 React Router
 
-Hooks (useState, useEffect)
+JavaScript (ES6+)
 
-Modular components (dashboards, modals, forms)
+CSS (Inline & Component-based)
 
 Backend
 
@@ -216,9 +125,9 @@ Node.js
 
 Express.js
 
-REST APIs (GET, POST, DELETE)
+RESTful APIs
 
-Nodemailer for OTP emails
+Nodemailer (for OTP emails)
 
 Database
 
@@ -228,28 +137,12 @@ UUID-based primary keys
 
 Foreign key constraints
 
-Role-based data separation
+Relational schema design
 
- Communication Flow
+ System Architecture :
 
 Frontend communicates with backend using Fetch API
 
-Backend validates requests and interacts with Supabase
+Backend handles authentication, business logic, and database operations
 
-Responses are sent as JSON
-
-Frontend updates UI dynamically without page reloads
-
- Main Highlights
-
-Fully role-based system
-
-Secure OTP authentication
-
-Multi-level approval workflow
-
-Real-world academic logic
-
-Clean separation of frontend and backend
-
-Scalable database design
+Supabase manages structured relational data and integrity constraints
