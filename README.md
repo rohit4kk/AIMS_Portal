@@ -43,26 +43,29 @@ Follow the steps below to run the project locally.
 
 The application should now be running successfully
 
- Overview:
+ 🎓 AIMS – Academic Information Management System
+📌 Overview
 
-AIMS (Academic Information Management System) is a role-based web application designed to manage academic processes in a college environment. It digitizes workflows such as course offering, student enrollment, approval management, grading, and academic record tracking.
+AIMS (Academic Information Management System) is a role-based web application designed to manage academic workflows in a college environment. It digitizes key processes such as course offering, student enrollment, approval handling, grading, and academic record management.
 
-The system supports four user roles — Student, Instructor, Faculty Advisor, and Admin — each having a dedicated dashboard with role-specific functionalities. A key feature of AIMS is its multi-level course enrollment process, where a student’s enrollment request must be approved by the course instructor and then by the faculty advisor before final enrollment.
+The system supports four user roles — Student, Instructor, Faculty Advisor, and Admin — each with a dedicated dashboard and role-specific permissions.
 
-Authentication is implemented using a secure OTP-based email login system, eliminating the need for passwords. The application follows a clean frontend–backend separation and uses a relational database with proper constraints to ensure data consistency and integrity.
+AIMS follows a multi-level course enrollment workflow, where a student’s enrollment request must first be approved by the course instructor and then by the faculty advisor before the student is officially enrolled. This closely reflects real-world academic approval processes used in universities.
 
-✨ Features:
- Authentication
+Authentication is implemented using a secure OTP-based email login system, eliminating the need for passwords and improving usability and security.
+
+✨ Features
+🔐 Authentication
 
 OTP-based email login (no passwords)
 
-Secure session handling
+Role-based access control
 
-Role-based redirection after login
+Automatic redirection based on user role
 
- Student
+🧑‍🎓 Student Module
 
-View available courses
+View courses offered
 
 Search courses by course code
 
@@ -70,25 +73,25 @@ Request course enrollment
 
 Track enrollment status
 
-Drop courses (based on eligibility rules)
+Drop courses based on eligibility rules
 
-View academic record grouped by semester
+View academic record grouped semester-wise
 
- Instructor
+👨‍🏫 Instructor Module
 
-View instructor dashboard
+Instructor dashboard
 
 Add and manage courses
 
-View enrollment requests
+View pending enrollment requests
 
-Approve or reject student enrollments
+Approve or reject student requests
 
 View enrolled students
 
 Assign and update grades
 
- Faculty Advisor
+🧑‍💼 Faculty Advisor Module
 
 View assigned students
 
@@ -98,17 +101,17 @@ Approve or reject enrollments
 
 View approval history
 
- Admin
+🛠 Admin Module
 
 Dedicated admin dashboard
 
-Add students, instructors, and faculty advisors
+Add new students, instructors, and faculty advisors
 
-Automatic user creation with UUID-based IDs
+Automatic UUID-based user creation
 
-No manual database entry required
+No manual database insertion required
 
- Tech Stack :-
+🧰 Tech Stack
 Frontend
 
 React
@@ -117,7 +120,7 @@ React Router
 
 JavaScript (ES6+)
 
-CSS (Inline & Component-based)
+CSS (component-based styling)
 
 Backend
 
@@ -125,9 +128,9 @@ Node.js
 
 Express.js
 
-RESTful APIs
+RESTful API architecture
 
-Nodemailer (for OTP emails)
+Nodemailer (for OTP email delivery)
 
 Database
 
@@ -137,12 +140,12 @@ UUID-based primary keys
 
 Foreign key constraints
 
-Relational schema design
+Relational database design
 
- System Architecture :
+🔄 System Architecture
 
-Frontend communicates with backend using Fetch API
+Frontend communicates with backend using the Fetch API
 
 Backend handles authentication, business logic, and database operations
 
-Supabase manages structured relational data and integrity constraints
+Supabase manages persistent data storage and enforces data integrit
