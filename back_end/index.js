@@ -259,39 +259,76 @@ app.get("/instructor/:id", async (req, res) => {
   res.json(data[0]);
 });
 
-app.post("/instructor/add-course", async (req, res) => {
-  const { course_id, semester, instructorId } = req.body;
 
-  // ✅ Correct validation
-  if (!course_id || !semester || !instructorId) {
+
+app.post("/instructor/add-course", async (req, res) => {
+  const { course_id, semester, instructorId, slot } = req.body;
+
+  if (!course_id || !semester || !instructorId || !slot) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
-    // Insert into TEACHES table
+    // 1️⃣ Check instructor slot clash
+    const { data: clash, error: clashError } = await supabase
+      .from("teaches")
+      .select("course_id")
+      .eq("instructor_id", instructorId)
+      .eq("semester", semester)
+      .eq("slot", slot);
+
+    if (clashError) {
+      console.error(clashError);
+      return res.status(500).json({ error: "Failed to check slot clash" });
+    }
+
+    if (clash.length > 0) {
+      return res.status(400).json({
+        error: "You already have a course in this slot for this semester"
+      });
+    }
+
+    // 2️⃣ Insert course offering
     const { error } = await supabase
       .from("teaches")
       .insert({
         instructor_id: instructorId,
         course_id,
-        semester
+        semester,
+        slot
       });
 
     if (error) {
       console.error(error);
-      return res.status(500).json({ error: error.message });
+
+      if (error.code === "23505") {
+        return res.status(400).json({
+          error: "Slot clash detected"
+        });
+      }
+
+      if (error.code === "23503") {
+        return res.status(400).json({
+          error: "Invalid course or slot"
+        });
+      }
+
+      return res.status(500).json({ error: "Failed to add course offering" });
     }
 
     res.json({
       message: "Course offering added successfully",
       course_id,
-      semester
+      semester,
+      slot
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 
 app.get("/instructor/:id/courses", async (req, res) => {
@@ -382,6 +419,7 @@ app.get("/courses", async (req, res) => {
       .from("teaches")
       .select(`
         semester,
+        slot,
         courses (
           course_id,
           title,
@@ -399,7 +437,7 @@ app.get("/courses", async (req, res) => {
       return res.status(500).json({ error: "Failed to fetch courses" });
     }
 
-    // 2️⃣ Fetch eligibility table
+    // 2️⃣ Fetch eligibility rules
     const { data: eligibilityData, error: eligibilityError } = await supabase
       .from("course_eligibility")
       .select(`
@@ -414,28 +452,32 @@ app.get("/courses", async (req, res) => {
       return res.status(500).json({ error: "Failed to fetch course eligibility" });
     }
 
-    // 3️⃣ Merge courses + eligibility
-    const formatted = teachesData.map(row => {
-      const courseId = row.courses.course_id;
-      const semester = row.semester;
+    // 3️⃣ Merge data safely
+    const formatted = teachesData
+      .map(row => {
+        if (!row.courses || !row.instructors) return null;
 
-      return {
-        course_id: courseId,
-        title: row.courses.title,
-        department: row.courses.department,
-        credits: row.courses.credits,
-        semester,
-        ltpsc: row.courses["L-P-T-S-C"],
-        instructor_name: row.instructors.name,
+        const courseId = row.courses.course_id;
+        const semester = row.semester;
 
-        // 🔹 attach eligibility for this course + semester
-        eligibility: eligibilityData.filter(
-          e =>
-            e.course_id === courseId &&
-            e.semester === semester
-        )
-      };
-    });
+        return {
+          course_id: courseId,
+          title: row.courses.title,
+          department: row.courses.department,
+          credits: row.courses.credits,
+          semester,
+          slot: row.slot,
+          ltpsc: row.courses["L-P-T-S-C"],
+          instructor_name: row.instructors.name,
+
+          eligibility: eligibilityData.filter(
+            e =>
+              e.course_id === courseId &&
+              e.semester === semester
+          )
+        };
+      })
+      .filter(Boolean);
 
     res.json(formatted);
 
@@ -444,6 +486,8 @@ app.get("/courses", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
 
 
 app.post("/admin/import-students", async (req, res) => {
@@ -602,19 +646,25 @@ app.get("/courses/:courseId/requests", async (req, res) => {
   res.json(formatted);
 });
 
+
+
 // Enroll in a course
 app.post("/courses/:courseId/enroll", async (req, res) => {
   const { courseId } = req.params;
-  const { studentId, semester,role } = req.body;
+  const { studentId, semester, role } = req.body;
 
+  // ================= BASIC VALIDATION =================
   if (!studentId || !semester) {
     return res.status(400).json({ error: "Missing required fields" });
   }
-  if(role!="STUDENT"){
-    return res.status(400).json({error: "Only Students can enroll in the course"});
+
+  if (role !== "STUDENT") {
+    return res.status(400).json({
+      error: "Only students can enroll in the course"
+    });
   }
 
-  // Check if already enrolled/requested
+  // ================= DUPLICATE CHECK =================
   const { data: existing } = await supabase
     .from("takes")
     .select("student_id")
@@ -624,90 +674,125 @@ app.post("/courses/:courseId/enroll", async (req, res) => {
     .limit(1);
 
   if (existing && existing.length > 0) {
-    return res
-      .status(400)
-      .json({ error: "Already enrolled or request exists" });
+    return res.status(400).json({
+      error: "Already enrolled or request exists"
+    });
   }
-  // 1️⃣ Fetch student info
-const { data: student, error: studentError } = await supabase
-  .from("students")
-  .select("department, year")
-  .eq("id", studentId)
-  .single();
 
-if (studentError || !student) {
-  return res.status(400).json({ error: "Student not found" });
-}
+  // ================= FETCH STUDENT =================
+  const { data: student, error: studentError } = await supabase
+    .from("students")
+    .select("department, year")
+    .eq("id", studentId)
+    .single();
 
-// 2️⃣ Check eligibility
-const { data: eligible, error: eligibilityError } = await supabase
-  .from("course_eligibility")
-  .select("course_id")
-  .eq("course_id", courseId)
-  .eq("semester", semester)
-  .eq("entry_year", student.year)
-  .or(`branch.eq.${student.department},branch.eq.All`)
-  .limit(1);
+  if (studentError || !student) {
+    return res.status(400).json({ error: "Student not found" });
+  }
 
+  // ================= CHECK ELIGIBILITY =================
+  const { data: eligible } = await supabase
+    .from("course_eligibility")
+    .select("course_id")
+    .eq("course_id", courseId)
+    .eq("semester", semester)
+    .eq("entry_year", student.year)
+    .or(`branch.eq.${student.department},branch.eq.All`)
+    .limit(1);
 
-// ❌ Not eligible
-if (!eligible || eligible.length === 0) {
-  return res.status(403).json({
-    error: "You are not eligible for this course"
-  });
-}
+  if (!eligible || eligible.length === 0) {
+    return res.status(403).json({
+      error: "You are not eligible for this course"
+    });
+  }
 
-  // Insert enrollment request
-  const { error } = await supabase.from("takes").insert({
-    student_id: studentId,
-    course_id: courseId,
-    semester,
-    status: "PENDING_INSTRUCTOR_APPROVAL"
-  });
+  // ====================================================
+  // 🔹 SLOT CLASH CHECK (NO FK, SAFE WITH YOUR SCHEMA)
+  // ====================================================
 
-  if (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Failed to enroll" });
+  // 1️⃣ Fetch slot of the target course offering
+  const { data: target, error: targetError } = await supabase
+    .from("teaches")
+    .select("slot")
+    .eq("course_id", courseId)
+    .eq("semester", semester)
+    .limit(1)
+    .single();
+
+  if (targetError || !target) {
+    return res.status(400).json({
+      error: "Course offering not found"
+    });
+  }
+
+  const targetSlot = target.slot;
+
+  // 2️⃣ Fetch student's ACTIVE courses in same semester
+  const { data: activeCourses, error: activeError } = await supabase
+    .from("takes")
+    .select("course_id")
+    .eq("student_id", studentId)
+    .eq("semester", semester)
+    .in("status", [
+      "ENROLLED",
+      "PENDING_INSTRUCTOR_APPROVAL",
+      "PENDING_ADVISOR_APPROVAL"
+    ]);
+
+  if (activeError) {
+    console.error(activeError);
+    return res.status(500).json({
+      error: "Failed to check existing enrollments"
+    });
+  }
+
+  // 3️⃣ If student has any active course, check their slots
+  if (activeCourses.length > 0) {
+    const courseIds = activeCourses.map(c => c.course_id);
+
+    const { data: takenSlots, error: slotError } = await supabase
+      .from("teaches")
+      .select("course_id, slot")
+      .eq("semester", semester)
+      .in("course_id", courseIds);
+
+    if (slotError) {
+      console.error(slotError);
+      return res.status(500).json({
+        error: "Failed to check slot clash"
+      });
+    }
+
+    const clash = takenSlots.some(t => t.slot === targetSlot);
+
+    if (clash) {
+      return res.status(400).json({
+        error: "Slot clash: You already have a course in this slot"
+      });
+    }
+  }
+
+  // ================= INSERT ENROLLMENT =================
+  const { error: insertError } = await supabase
+    .from("takes")
+    .insert({
+      student_id: studentId,
+      course_id: courseId,
+      semester,
+      status: "PENDING_INSTRUCTOR_APPROVAL"
+    });
+
+  if (insertError) {
+    console.error(insertError);
+    return res.status(500).json({
+      error: "Failed to enroll"
+    });
   }
 
   res.json({ message: "Enrollment request submitted" });
 });
 
-// fetch course enrollment requests for instructor approval
-app.get("/instructor/course/:courseId/requests", async (req, res) => {
-  const { courseId } = req.params;
 
-  const { data, error } = await supabase
-    .from("takes")
-    .select(`
-      student_id,
-      status,
-      students (
-        name,
-        email,
-        department,
-        roll_no
-      )
-    `)
-    .eq("course_id", courseId)
-    .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
-
-  if (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Failed to fetch requests" });
-  }
-
-  const formatted = data.map(row => ({
-    student_id: row.student_id,
-    name: row.students.name,
-    email: row.students.email,
-    department: row.students.department,
-    roll_no: row.students.roll_no,
-    status: row.status
-  }));
-
-  res.json(formatted);
-});
 
 
 // approve enrollment request
@@ -1416,6 +1501,21 @@ app.post("/fa/decision-bulk", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Bulk decision failed" });
   }
+});
+
+
+// ================= FETCH ALL SLOTS =================
+app.get("/slots", async (req, res) => {
+  const { data, error } = await supabase
+    .from("slots")
+    .select("slot_code, description");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch slots" });
+  }
+
+  res.json(data);
 });
 
 

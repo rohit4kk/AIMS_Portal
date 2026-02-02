@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 export default function CourseModal({ course, onClose }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const studentId = localStorage.getItem("userId");
-  const role=localStorage.getItem("role");
 
+  const studentId = localStorage.getItem("userId");
+  const role = localStorage.getItem("role");
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -24,18 +24,9 @@ export default function CourseModal({ course, onClose }) {
     setLoading(false);
   };
 
-  console.log("studentId from localStorage:", studentId, typeof studentId);
-
-requests.forEach((req, i) => {
-  console.log(
-    `req[${i}].student_id:`,
-    req.student_id,
-    typeof req.student_id
-  );
-});
-
   const myRequest = requests.find(
-  (req) => req.student_id === studentId);
+    (req) => req.student_id === studentId
+  );
 
   const handleEnroll = async () => {
     const res = await fetch(
@@ -54,7 +45,7 @@ requests.forEach((req, i) => {
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.error);
+      alert(data.error); // slot clash / eligibility / duplicate
       return;
     }
 
@@ -62,28 +53,26 @@ requests.forEach((req, i) => {
   };
 
   const handleDrop = async () => {
-  const res = await fetch(
-    `http://localhost:5001/courses/${course.course_id}/drop`,
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ studentId })
+    const res = await fetch(
+      `http://localhost:5001/courses/${course.course_id}/drop`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ studentId })
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error);
+      return;
     }
-  );
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    alert(data.error);
-    return;
-  }
-
-  // Refresh requests list
-  fetchRequests();
-};
-
+    fetchRequests();
+  };
 
   useEffect(() => {
     if (course) fetchRequests();
@@ -92,12 +81,9 @@ requests.forEach((req, i) => {
   if (!course) return null;
 
   const canDrop =
-  myRequest && 
-  ["ENROLLED", "PENDING_INSTRUCTOR_APPROVAL", "PENDING_ADVISOR_APPROVAL"]
-    .includes(myRequest.status);
-
-  
-
+    myRequest &&
+    ["ENROLLED", "PENDING_INSTRUCTOR_APPROVAL", "PENDING_ADVISOR_APPROVAL"]
+      .includes(myRequest.status);
 
   return (
     <div className="course-modal-overlay">
@@ -113,8 +99,11 @@ requests.forEach((req, i) => {
         </div>
 
         {/* DETAILS */}
+        <p><strong>Semester:</strong> {course.semester}</p>
+        <p><strong>Slot:</strong> {course.slot}</p> {/* ✅ NEW */}
         <p><strong>Credits:</strong> {course.credits}</p>
         <p><strong>Department:</strong> {course.department}</p>
+        <p><strong>Instructor:</strong> {course.instructor_name}</p>
 
         {canDrop ? (
           <button
@@ -132,7 +121,6 @@ requests.forEach((req, i) => {
             Enroll
           </button>
         )}
-        
 
         <hr style={{ margin: "20px 0", borderColor: "#333" }} />
 

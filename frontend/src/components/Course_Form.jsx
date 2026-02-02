@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./public/Course_Form.css";
 
 export default function Course_Form({ onClose, onCourseAdded }) {
@@ -7,12 +7,29 @@ export default function Course_Form({ onClose, onCourseAdded }) {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [semester, setSemester] = useState("");
 
+  // 🔹 SLOT STATES (NEW)
+  const [slots, setSlots] = useState([]);
+  const [slot, setSlot] = useState("");
+
   // ELIGIBILITY STATES
   const [branch, setBranch] = useState("");
   const [year, setYear] = useState("");
   const [eligibility, setEligibility] = useState([]);
 
   const instructorId = localStorage.getItem("userId");
+
+  /* =======================
+     FETCH SLOTS (NEW)
+     ======================= */
+  useEffect(() => {
+    fetch("http://localhost:5001/slots")
+      .then(res => res.json())
+      .then(data => setSlots(data))
+      .catch(err => {
+        console.error(err);
+        alert("Failed to load slots");
+      });
+  }, []);
 
   /* =======================
      COURSE AUTOCOMPLETE
@@ -73,24 +90,27 @@ export default function Course_Form({ onClose, onCourseAdded }) {
      SUBMIT
      ======================= */
   const handleSubmit = async () => {
-    if (!selectedCourse || !semester || eligibility.length === 0) {
-      alert("Please select course, semester and eligibility");
+    if (!selectedCourse || !semester || !slot || eligibility.length === 0) {
+      alert("Please select course, semester, slot and eligibility");
       return;
     }
 
-    // 1️⃣ ADD COURSE OFFERING
+    // 1️⃣ ADD COURSE OFFERING (slot added)
     const res = await fetch("http://localhost:5001/instructor/add-course", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         course_id: selectedCourse.course_id,
         instructorId,
-        semester
+        semester,
+        slot
       })
     });
 
+    const data = await res.json();
+
     if (!res.ok) {
-      alert("Failed to add course");
+      alert(data.error || "Failed to add course");
       return;
     }
 
@@ -150,6 +170,20 @@ export default function Course_Form({ onClose, onCourseAdded }) {
         <option value="2025-S">2025-S</option>
       </select>
 
+      {/* SLOT (NEW) */}
+      <select
+        value={slot}
+        onChange={(e) => setSlot(e.target.value)}
+        className="slot-select"
+      >
+        <option value="">Select Slot</option>
+        {slots.map(s => (
+          <option key={s.slot_code} value={s.slot_code}>
+            {s.slot_code} — {s.description}
+          </option>
+        ))}
+      </select>
+
       {/* ELIGIBILITY SECTION */}
       <div className="eligibility-section">
         <h4>Course Eligibility</h4>
@@ -164,7 +198,6 @@ export default function Course_Form({ onClose, onCourseAdded }) {
             <option value="CE">CE</option>
           </select>
 
-        {/* YEAR AS INPUT */}
           <input
             type="number"
             placeholder="Year (e.g. 2023)"

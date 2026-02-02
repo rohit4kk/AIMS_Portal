@@ -73,12 +73,11 @@ export default function CoursesOffered() {
         />
 
         <select
-            className="course-filter-select"
-            value={deptFilter}
-            onChange={(e) => setDeptFilter(e.target.value)}
-            style={{ backgroundColor: "rgb(156,148,148)" }}
-          >
-
+          className="course-filter-select"
+          value={deptFilter}
+          onChange={(e) => setDeptFilter(e.target.value)}
+          style={{ backgroundColor: "rgb(156,148,148)" }}
+        >
           <option value="">Offering Department</option>
           <option value="CSE">CSE</option>
           <option value="ECE">ECE</option>
@@ -109,7 +108,7 @@ export default function CoursesOffered() {
           className="course-search-btn"
           onClick={handleSearch}
           title="Search"
-          style={{backgroundColor:"#3EBB9E"}}
+          style={{ backgroundColor: "#3EBB9E" }}
         >
           🔍
         </button>
@@ -129,6 +128,7 @@ export default function CoursesOffered() {
 
             <div className="course-meta">
               <div><b>Semester:</b> {course.semester}</div>
+              <div><b>Slot:</b> {course.slot}</div> {/* ✅ NEW */}
               <div><b>Instructor:</b> {course.instructor_name}</div>
               <div><b>Department:</b> {course.department}</div>
               <div><b>L-P-T-S-C:</b> {course.ltpsc ?? "NA"}</div>
@@ -150,7 +150,6 @@ export default function CoursesOffered() {
           </div>
         ))}
       </div>
-
 
       {selectedCourse && (
         <CourseModal
