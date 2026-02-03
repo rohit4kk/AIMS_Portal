@@ -5,7 +5,7 @@ import "./public/Instructor.css";
 export default function Instructor() {
   const [courses, setCourses] = useState([]);
   const [instructor, setInstructor] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false); // ✅ NEW
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navigate = useNavigate();
   const instructorId = localStorage.getItem("userId");
@@ -27,7 +27,7 @@ export default function Instructor() {
 
   const go = (path) => {
     navigate(path);
-    setMenuOpen(false); // close mobile menu
+    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -52,7 +52,6 @@ export default function Instructor() {
     <div className="instructor-page">
       {/* NAVBAR */}
       <div className="navbar">
-        {/* LEFT */}
         <div className="combined">
           <div className="student-logo">AIMS</div>
 
@@ -118,7 +117,7 @@ export default function Instructor() {
 
           {courses.map((course) => (
             <button
-              key={course.course_id}
+              key={`${course.course_id}-${course.semester}`}
               className="course-card"
               onClick={() =>
                 navigate(`/instructor/course/${course.course_id}`, {
@@ -133,6 +132,8 @@ export default function Instructor() {
               Credits: {course.credits}
               <br />
               Semester: {course.semester}
+              <br />
+              Slot: <b>{course.slot}</b> {/* ✅ NEW */}
             </button>
           ))}
         </div>

@@ -364,29 +364,74 @@ app.get("/instructor/:id/courses", async (req, res) => {
   res.json(formatted);
 });
 
-//For bulk approval by instructor
-app.post("/instructor/course/:courseId/approve-bulk", async (req, res) => {
+// ================= INSTRUCTOR: PENDING APPROVAL REQUESTS =================
+app.get("/instructor/course/:courseId/requests", async (req, res) => {
   const { courseId } = req.params;
-  const { studentIds } = req.body;
+  const { semester } = req.query;
 
-  if (!Array.isArray(studentIds) || studentIds.length === 0) {
-    return res.status(400).json({ error: "No students selected" });
+  if (!semester) {
+    return res.status(400).json({ error: "Semester is required" });
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("takes")
-    .update({ status: "PENDING_ADVISOR_APPROVAL" })
+    .select(`
+      student_id,
+      status,
+      students (
+        name,
+        email,
+        department,
+        roll_no
+      )
+    `)
     .eq("course_id", courseId)
-    .in("student_id", studentIds)
+    .eq("semester", semester)
     .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
 
   if (error) {
     console.error(error);
-    return res.status(500).json({ error: "Failed to approve requests" });
+    return res.status(500).json({ error: "Failed to fetch requests" });
   }
 
-  res.json({ message: "Selected requests approved" });
+  const formatted = data.map(row => ({
+    student_id: row.student_id,
+    name: row.students.name,
+    email: row.students.email,
+    department: row.students.department,
+    roll_no: row.students.roll_no,
+    status: row.status
+  }));
+
+  res.json(formatted);
 });
+
+
+//For bulk approval by instructor
+app.post("/instructor/course/:courseId/approve-bulk", async (req, res) => {
+  const { courseId } = req.params;
+  const { studentIds, semester } = req.body;
+
+  if (!studentIds || studentIds.length === 0 || !semester) {
+    return res.status(400).json({ error: "Student IDs and semester required" });
+  }
+
+  const { error } = await supabase
+    .from("takes")
+    .update({ status: "ENROLLED" })
+    .in("student_id", studentIds)
+    .eq("course_id", courseId)
+    .eq("semester", semester)
+    .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
+
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Bulk approval failed" });
+  }
+
+  res.json({ message: "Students approved successfully" });
+});
+
 
 // Student information
 app.get("/student/:id", async (req, res) => {
@@ -798,17 +843,18 @@ app.post("/courses/:courseId/enroll", async (req, res) => {
 // approve enrollment request
 app.post("/instructor/course/:courseId/approve", async (req, res) => {
   const { courseId } = req.params;
-  const { studentId } = req.body;
+  const { studentId, semester } = req.body;
 
-  if (!studentId) {
-    return res.status(400).json({ error: "Student ID required" });
+  if (!studentId || !semester) {
+    return res.status(400).json({ error: "Missing studentId or semester" });
   }
 
   const { error } = await supabase
     .from("takes")
-    .update({ status: "PENDING_ADVISOR_APPROVAL" })
-    .eq("course_id", courseId)
+    .update({ status: "ENROLLED" })
     .eq("student_id", studentId)
+    .eq("course_id", courseId)
+    .eq("semester", semester)
     .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
 
   if (error) {
@@ -816,23 +862,25 @@ app.post("/instructor/course/:courseId/approve", async (req, res) => {
     return res.status(500).json({ error: "Failed to approve request" });
   }
 
-  res.json({ message: "Request approved" });
+  res.json({ message: "Student approved successfully" });
 });
+
 
 // reject enrollment request
 app.post("/instructor/course/:courseId/reject", async (req, res) => {
   const { courseId } = req.params;
-  const { studentId } = req.body;
+  const { studentId, semester } = req.body;
 
-  if (!studentId) {
-    return res.status(400).json({ error: "Student ID required" });
+  if (!studentId || !semester) {
+    return res.status(400).json({ error: "Missing studentId or semester" });
   }
 
   const { error } = await supabase
     .from("takes")
     .update({ status: "REJECTED_BY_INSTRUCTOR" })
-    .eq("course_id", courseId)
     .eq("student_id", studentId)
+    .eq("course_id", courseId)
+    .eq("semester", semester)
     .eq("status", "PENDING_INSTRUCTOR_APPROVAL");
 
   if (error) {
@@ -840,7 +888,7 @@ app.post("/instructor/course/:courseId/reject", async (req, res) => {
     return res.status(500).json({ error: "Failed to reject request" });
   }
 
-  res.json({ message: "Request rejected" });
+  res.json({ message: "Student rejected successfully" });
 });
 
 

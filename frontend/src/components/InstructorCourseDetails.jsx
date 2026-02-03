@@ -6,7 +6,7 @@ import "./public/InstructorCourseDetails.css";
 export default function InstructorCourseDetails() {
   const { courseId } = useParams();
   const location = useLocation();
-  const course = location.state;
+  const course = location.state; // contains semester, slot, etc.
   const navigate = useNavigate();
 
   const [requests, setRequests] = useState([]);
@@ -20,7 +20,7 @@ export default function InstructorCourseDetails() {
 
   const fetchRequests = async () => {
     const res = await fetch(
-      `http://localhost:5001/instructor/course/${courseId}/requests`
+      `http://localhost:5001/instructor/course/${courseId}/requests?semester=${course.semester}`
     );
     const data = await res.json();
 
@@ -76,7 +76,10 @@ export default function InstructorCourseDetails() {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentIds: approvedIds })
+        body: JSON.stringify({
+          studentIds: approvedIds,
+          semester: course.semester
+        })
       }
     );
 
@@ -92,7 +95,7 @@ export default function InstructorCourseDetails() {
     setMobileMenuOpen(false);
 
     fetchRequests();
-    fetchEnrolledStudents(); // 🔁 refresh count
+    fetchEnrolledStudents();
   };
 
   /* ================= SINGLE ACTIONS ================= */
@@ -103,7 +106,10 @@ export default function InstructorCourseDetails() {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId })
+        body: JSON.stringify({
+          studentId,
+          semester: course.semester
+        })
       }
     );
 
@@ -123,7 +129,10 @@ export default function InstructorCourseDetails() {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId })
+        body: JSON.stringify({
+          studentId,
+          semester: course.semester
+        })
       }
     );
 
@@ -209,6 +218,7 @@ export default function InstructorCourseDetails() {
         <div className="course-meta">
           <p><strong>Credits:</strong> {course.credits}</p>
           <p><strong>Semester:</strong> {course.semester}</p>
+          <p><strong>Slot:</strong> {course.slot}</p>
           <p><strong>Enrolled Students:</strong> {enrolledStudents.length}</p>
         </div>
       </div>
