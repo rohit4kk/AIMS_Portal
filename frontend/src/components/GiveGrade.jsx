@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "./public/GiveGrade.css";
+import Papa from "papaparse";
+
 
 const grades = ["A", "A-", "B", "B-", "C", "C-", "D", "E", "F"];
 
@@ -15,6 +17,40 @@ export default function GiveGrade({ courseId, onClose }) {
     if (res.ok) setStudents(data);
     else console.error(data.error);
   };
+
+
+  const handleCSVUpload = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: async (result) => {
+      const rows = result.data;
+
+      const res = await fetch(
+        `http://localhost:5001/instructor/course/${courseId}/upload-grades-csv`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rows })
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error);
+        return;
+      }
+
+      alert("Grades uploaded successfully");
+      fetchEnrolled(); // refresh table
+    }
+  });
+};
+
 
   useEffect(() => {
     fetchEnrolled();
@@ -47,6 +83,12 @@ export default function GiveGrade({ courseId, onClose }) {
           Close
         </button>
       </div>
+        <div className="csv-upload">
+      <label>
+        Upload Grades (CSV):
+        <input type="file" accept=".csv" onChange={handleCSVUpload} />
+      </label>
+    </div>
 
       <table className="grade-table">
         <thead>
@@ -76,6 +118,12 @@ export default function GiveGrade({ courseId, onClose }) {
 function GradeRow({ student, onSubmit }) {
   const [grade, setGrade] = useState(student.grade || "");
   const [isEditing, setIsEditing] = useState(!student.grade);
+
+  useEffect(() => {
+  setGrade(student.grade || "");
+  setIsEditing(!student.grade);
+}, [student.grade]);
+
 
   const handleSubmit = () => {
     if (!grade) {
