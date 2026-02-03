@@ -1017,25 +1017,51 @@ app.get("/instructor/course/:courseId/enrolled", async (req, res) => {
   const { courseId } = req.params;
 
   const { data, error } = await supabase
-    .from("takes")
-    .select(`
-      student_id,
-      grade,
-      students (
-        name,
-        email,
-        roll_no
-      )
-    `)
-    .eq("course_id", courseId)
-    .eq("status", "ENROLLED");
+  .from("takes")
+  .select(`
+    student_id,
+    grade,
+    students (
+      name,
+      email,
+      roll_no
+    )
+  `)
+  .eq("course_id", courseId)
+  .eq("status", "ENROLLED");
 
-  if (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Failed to fetch enrolled students" });
-  }
+if (error) {
+  console.error(error);
+  return;
+}
 
-  const formatted = data.map(row => ({
+function parseRoll(roll) {
+  // 2023CSB1155 → { year: 2023, branch: 'CSB', num: 1155 }
+  const match = roll.match(/^(\d{4})([A-Z]+)(\d+)$/);
+
+  if (!match) return null;
+
+  return {
+    year: Number(match[1]),
+    branch: match[2],
+    num: Number(match[3])
+  };
+}
+
+const sortedData = data.sort((a, b) => {
+  const A = parseRoll(a.students.roll_no);
+  const B = parseRoll(b.students.roll_no);
+
+  if (!A || !B) return 0;
+
+  if (A.year !== B.year) return A.year - B.year;
+  if (A.branch !== B.branch) return A.branch.localeCompare(B.branch);
+  return A.num - B.num;
+});
+
+
+
+  const formatted = sortedData.map(row => ({
     student_id: row.student_id,
     name: row.students.name,
     email: row.students.email,
@@ -1045,6 +1071,7 @@ app.get("/instructor/course/:courseId/enrolled", async (req, res) => {
 
   res.json(formatted);
 });
+
 
 // ================= SUBMIT GRADE =================
 app.post("/instructor/course/:courseId/grade", async (req, res) => {
@@ -1571,6 +1598,7 @@ app.get("/slots", async (req, res) => {
 app.listen(5001, () => {
   console.log("AIMS backend running on port 5001");
 });
+
 
 
 
